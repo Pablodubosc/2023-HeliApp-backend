@@ -74,16 +74,17 @@ const getGoalsByUserWithProgress = async(req,res) => {
       };
     
       const result = await mealModel.find(filter);
-      let totalCalorias = 0;
+      const goalType = item.type;
+      let totalConsumido = 0;
       result.forEach((record) => {
-        totalCalorias += record.calories;
+        totalConsumido += record[goalType];
       });
 
       const state = await calculateGoalStatus(item)
     
       const newItem = {
         ...item.toObject(),
-        totalCalorias: totalCalorias,
+        totalConsumido: totalConsumido,
         state : state
       };
     

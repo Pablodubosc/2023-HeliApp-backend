@@ -4,23 +4,33 @@ const mongooseDelete = require('mongoose-delete');
 const goalSchema = new mongoose.Schema(
     {
         name:{
-            type: String,            
+            type: String,
+            requiere: true            
         },
-        calories:{
+        type:{
+            type: String,
+            requiere: true
+        },
+        objetive:{
             type: Number,
             min: [0],
+            requiere: true
         },
         userId:{
-            type: String
+            type: String,
+            requiere: true
         },
         startDate:{
-            type: Date
+            type: Date,
+            requiere: true
         },
         endDate:{
-            type: Date
+            type: Date,
+            requiere: true
         },
         recurrency:{
-            type: String
+            type: String,
+            requiere: true
         }
     },
     {

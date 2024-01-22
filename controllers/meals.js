@@ -25,11 +25,9 @@ const getMealsByUserIdAndDate = async (req, res) => {
   try {
     const user = req.user;
 
-    const date = new RegExp(`^${req.params.date}`);
-
     const filter = {
       userId: req.params.id,
-      date: { $regex: date },
+      date: {$gte: new Date(`${req.params.date}T00:00:00.000Z`), $lt: new Date(`${req.params.date}T23:59:59.999Z`) }
     };
 
     const data = await mealModel.find(filter);
@@ -95,7 +93,7 @@ const getCaloriesByDays = async (req, res) => {
     const meals = await mealModel.find(filter);
     const dataOfMeals = {};
     meals.forEach((item) => {
-      const date = item.date;
+      const date = item.date.toISOString().split('T')[0];
       const calories = item.calories;
 
       if (dataOfMeals[date]) {
@@ -104,6 +102,7 @@ const getCaloriesByDays = async (req, res) => {
         dataOfMeals[date] = calories;
       }
     });
+
 
     function obtenerFechaSinHora(date) {
       return date.split('T')[0];
@@ -118,7 +117,6 @@ const getCaloriesByDays = async (req, res) => {
         fechasIntermedias[index].calories = calories;
       }
     }
-
     res.send({ fechasIntermedias });
   } catch (e) {
     handleHttpError(res, "ERROR_GET_CALORIES", 500);
@@ -130,6 +128,7 @@ const getCaloriesBetweenDays = async (req, res) => {
     const userId = req.params.id;
     const startDate = req.params.startDate;
     const endDate = req.params.endDate;
+    const type = req.params.type;
     const filter = {
       userId: userId,
       date: { $gte: startDate, $lte: endDate },
@@ -137,12 +136,12 @@ const getCaloriesBetweenDays = async (req, res) => {
 
     const result = await mealModel.find(filter);
 
-    let totalCalorias = 0;
+    let totalConsumido = 0;
     result.forEach((record) => {
-      totalCalorias += record.calories;
+      totalConsumido += record[type];
     });
 
-    res.send({ totalCalorias });
+    res.send({ totalConsumido });
   } catch (e) {
     handleHttpError(res, "ERROR_GET_CALORIES", 500);
   }
