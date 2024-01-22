@@ -10,25 +10,28 @@ const mealSchema = new mongoose.Schema(
       type: [],
     },
     date: {
-      type: String,
+      type: Date,
     },
     hour: {
       type: String,
     },
     calories: {
       type: Number,
-      min: [0, "Calories cant be negative"]
+      min: [0]
     },
     carbs: {
-      type: String,
+      type: Number,
+      min: [0],
       default: 0,
     },
     proteins: {
-      type: String,
+      type: Number,
+      min: [0],
       default: 0,
     },
     fats: {
-      type: String,
+      type: Number,
+      min: [0],
       default: 0,
     },
     userId: {

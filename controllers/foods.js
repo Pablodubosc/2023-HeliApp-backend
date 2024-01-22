@@ -1,4 +1,4 @@
-const { foodModel } = require("../models");
+const { foodModel, usersModel } = require("../models");
 const { handleHttpError } = require("../utils/handleErrors");
 
 const getFoods = async (req, res) => {
@@ -7,6 +7,20 @@ const getFoods = async (req, res) => {
     const data = await foodModel.find({});
     res.send({ data, user });
   } catch (e) {
+    handleHttpError(res, "ERROR_GET_FOODS", 500);
+  }
+};
+
+const getFoodsWithOutAllergies = async (req, res) => {
+  try {
+    const user = req.user;
+    const allFoods = await foodModel.find({});
+    const allergies = await usersModel.findOne({ _id: req.params.id });
+    const data = allFoods.filter(alimento => !(allergies.allergies).some(alergia => alergia.name === alimento.name));
+
+    res.send({ data, user });
+  } catch (e) {
+    console.log(e)
     handleHttpError(res, "ERROR_GET_FOODS", 500);
   }
 };
@@ -23,6 +37,23 @@ const getFoodsByCategory = async (req, res) => {
   }
 };
 
+const getFoodsByCategoryWithOutAllergies = async (req, res) => {
+  try {
+    const user = req.user;
+    const foodsByCategory = await foodModel.find({
+      category: req.params.categoryName,
+    });
+    const allergies = await usersModel.findOne({ _id: req.params.id });
+    const data = foodsByCategory.filter(alimento => !(allergies.allergies).some(alergia => alergia.name === alimento.name));
+
+    res.send({ data, user });
+  } catch (e) {
+    console.log(e)
+    handleHttpError(res, "ERROR_GET_FOODS", 500);
+  }
+};
+
+
 const createFood = async (req, res) => {
   try {
     const data = await foodModel.create(req.body);
@@ -32,4 +63,4 @@ const createFood = async (req, res) => {
   }
 };
 
-module.exports = { getFoods, createFood, getFoodsByCategory };
+module.exports = { getFoods, createFood, getFoodsByCategory, getFoodsWithOutAllergies,getFoodsByCategoryWithOutAllergies };

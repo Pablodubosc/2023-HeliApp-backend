@@ -7,7 +7,8 @@ const goalSchema = new mongoose.Schema(
             type: String,            
         },
         calories:{
-            type: String
+            type: Number,
+            min: [0],
         },
         userId:{
             type: String
