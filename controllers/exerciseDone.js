@@ -52,6 +52,28 @@ const deleteExerciseDoneById = async (req, res) => {
   }
 };
 
+const getCaloriesBurnBetweenDays = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    const filter = {
+      userId: userId,
+      date: { $gte: startDate, $lte: endDate },
+    };
+
+    const result = await exerciseDoneModel.find(filter);
+
+    let totalConsumido = 0;
+    result.forEach((record) => {
+      totalConsumido += record.caloriesBurn;
+    });
+
+    res.send({ totalConsumido });
+  } catch (e) {
+    handleHttpError(res, "ERROR_GET_CALORIES", 500);
+  }
+};
 
 
 module.exports = {
@@ -60,4 +82,5 @@ module.exports = {
   getExerciseDoneByUserId,
   updateExerciseDoneById,
   deleteExerciseDoneById,
+  getCaloriesBurnBetweenDays
 };
