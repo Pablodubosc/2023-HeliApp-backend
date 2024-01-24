@@ -6,11 +6,13 @@ const {
   getExerciseDoneByUserId,
   updateExerciseDoneById,
   deleteExerciseDoneById,
-  getCaloriesBurnBetweenDays
+  getCaloriesBurnBetweenDays,
+  getExerciseDoneByUserIdAndDate
 } = require("../controllers/exerciseDone");
 
 router.get("/", getExerciseDone);
 router.get("/user/:id", getExerciseDoneByUserId);
+router.get("/user/:id/date/:date", getExerciseDoneByUserIdAndDate);
 router.post("/", createExerciseDone);
 router.put("/:id", updateExerciseDoneById);
 router.delete("/:id", deleteExerciseDoneById);

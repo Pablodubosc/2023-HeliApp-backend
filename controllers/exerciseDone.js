@@ -21,6 +21,23 @@ const getExerciseDoneByUserId = async (req, res) => {
   }
 };
 
+const getExerciseDoneByUserIdAndDate = async (req, res) => {
+  try {
+    const user = req.user;
+
+    const filter = {
+      userId: req.params.id,
+      date: {$gte: new Date(`${req.params.date}T00:00:00.000Z`), $lt: new Date(`${req.params.date}T23:59:59.999Z`) }
+    };
+
+    const data = await exerciseDoneModel.find(filter);
+    console.log(data)
+    res.send({ data, user });
+  } catch (e) {
+    handleHttpError(res, "ERROR_GET_MEALS", 500);
+  }
+};
+
 
 const createExerciseDone = async (req, res) => {
   try {
@@ -82,5 +99,6 @@ module.exports = {
   getExerciseDoneByUserId,
   updateExerciseDoneById,
   deleteExerciseDoneById,
-  getCaloriesBurnBetweenDays
+  getCaloriesBurnBetweenDays,
+  getExerciseDoneByUserIdAndDate
 };

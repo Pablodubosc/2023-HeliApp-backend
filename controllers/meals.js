@@ -69,9 +69,11 @@ const deleteMealById = async (req, res) => {
 
 const getCaloriesByDays = async (req, res) => {
   try {
+    
     const userId = req.params.id;
     const startDate = new Date(req.params.startDate).toISOString();
     const endDate = new Date(req.params.endDate).toISOString();
+    const type = req.params.type;
     const filter = {
       userId: userId,
       date: { $gte: startDate, $lte: endDate },
@@ -84,7 +86,7 @@ const getCaloriesByDays = async (req, res) => {
     while (fechaActual < fechaFin) {
       fechasIntermedias.push({
         date: fechaActual.toISOString(),
-        calories: 0
+        [type]: 0
       });
   
       fechaActual.setDate(fechaActual.getDate() + 1)
@@ -92,14 +94,15 @@ const getCaloriesByDays = async (req, res) => {
 
     const meals = await mealModel.find(filter);
     const dataOfMeals = {};
+
     meals.forEach((item) => {
       const date = item.date.toISOString().split('T')[0];
-      const calories = item.calories;
+      const typePerDay = item[type];
 
       if (dataOfMeals[date]) {
-        dataOfMeals[date] += calories;
+        dataOfMeals[date] += typePerDay;
       } else {
-        dataOfMeals[date] = calories;
+        dataOfMeals[date] = typePerDay;
       }
     });
 
@@ -108,13 +111,15 @@ const getCaloriesByDays = async (req, res) => {
       return date.split('T')[0];
     }
     
+ 
+
     // Recorre el segundo arreglo y actualiza el primero si encuentra una fecha coincidente (sin la hora)
     for (const date in dataOfMeals) {
-      const calories = dataOfMeals[date];
+      const typeValue = dataOfMeals[date];
       const fechaSinHora = obtenerFechaSinHora(date);
       const index = fechasIntermedias.findIndex(item => obtenerFechaSinHora(item.date) === fechaSinHora);
       if (index !== -1) {
-        fechasIntermedias[index].calories = calories;
+        fechasIntermedias[index][type] = typeValue;
       }
     }
     res.send({ fechasIntermedias });
