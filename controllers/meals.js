@@ -73,7 +73,7 @@ const getCaloriesByDays = async (req, res) => {
     const userId = req.params.id;
     const startDate = new Date(req.params.startDate).toISOString();
     const endDate = new Date(req.params.endDate).toISOString();
-    const type = req.params.type;
+    const type = req.params.type.toLowerCase();
     const filter = {
       userId: userId,
       date: { $gte: startDate, $lte: endDate },
