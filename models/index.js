@@ -9,6 +9,7 @@ const models = {
     intermittentFastingModel: require('./intermittentFasting'),
     exerciseModel: require('./exercise'),
     exerciseDoneModel: require('./exerciseDone'),
+    planModel: require('./plan'),
 }
 
 module.exports = models;

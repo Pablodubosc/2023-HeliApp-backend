@@ -8,7 +8,7 @@ const {
   updateMealById,
   deleteMealById,
   getCaloriesBetweenDays,
-  getCaloriesByDays
+  getCaloriesByDays,
 } = require("../controllers/meals");
 const { validatorCreateMeal } = require("../validators/meals");
 

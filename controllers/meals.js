@@ -1,4 +1,4 @@
-const { mealModel } = require("../models");
+const { mealModel, usersModel } = require("../models");
 const { handleHttpError } = require("../utils/handleErrors");
 
 const getMeals = async (req, res) => {
