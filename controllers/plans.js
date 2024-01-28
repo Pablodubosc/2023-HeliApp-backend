@@ -1,28 +1,35 @@
-const { mealModel, usersModel, planModel } = require("../models");
+const { mealModel, usersModel, planModel, exerciseDoneModel } = require("../models");
 const { handleHttpError } = require("../utils/handleErrors");
 
 const createPlan = async (req, res) => {
   try {
-
-    const calories = req.body.calories;
+    const planObjetive = req.body.planObjetive;
+    const planType = req.body.planType;
     const allMeals = await mealModel.find();
+    const allExercises = await exerciseDoneModel.find();
     const userJson = await usersModel.findOne({ _id: req.body.userId });
+    if (planType != "calories burn"){
+        const allergicFoods = userJson.allergies.map(allergy => allergy.name);
 
-    const allergicFoods = userJson.allergies.map(allergy => allergy.name);
+        // Filtra las comidas que no contienen alimentos alérgicos
+        const filteredMeals = allMeals.filter(meal => {
+          for (const food of meal.foods) {
+            if (allergicFoods.includes(food.name)) {
+              return false; // La comida contiene un alimento alérgico, no la incluyas
+            }
+          }
+          return true; // La comida no contiene alimentos alérgicos, inclúyela
+        });
 
-    // Filtra las comidas que no contienen alimentos alérgicos
-    const filteredMeals = allMeals.filter(meal => {
-      for (const food of meal.foods) {
-        if (allergicFoods.includes(food.name)) {
-          return false; // La comida contiene un alimento alérgico, no la incluyas
-        }
-      }
-      return true; // La comida no contiene alimentos alérgicos, inclúyela
-    });
+        const selectedMeals = selectMealsToMeetObjetive(filteredMeals, planObjetive, planType);
 
-    const selectedMeals = selectMealsToMeetCalories(filteredMeals, calories);
+        req.body.suggestions = selectedMeals;         
+    }
+    else{
+      const selectedExercise = selectExerciseToMeetObjetive(allExercises,planObjetive, planType);
 
-    req.body.meals = selectedMeals;
+      req.body.suggestions = selectedExercise; 
+    }
 
     const data = await planModel.create(req.body);
     res.send({ data });
@@ -31,8 +38,36 @@ const createPlan = async (req, res) => {
   }
 };
 
+const selectExerciseToMeetObjetive = (allExercises, target, targetType) => {
+  console.log("entra aca")
 
-const selectMealsToMeetCalories = (filteredMeals, targetCalories) => {
+  // Copia la lista de comidas para no modificar la original
+  const exercisesCopy = [...allExercises];
+
+  // Función para obtener una comida aleatoria de la lista
+  const getRandomExercise = () => {
+    const randomIndex = Math.floor(Math.random() * exercisesCopy.length);
+    return exercisesCopy.splice(randomIndex, 1)[0]; // Elimina y retorna la comida seleccionada
+  };
+
+  // Inicializa variables
+  let selectedExercises = [];
+  let currentObjetive = 0;
+
+  // Bucle para seleccionar comidas hasta alcanzar o superar las Calories
+  while ((currentObjetive < target) && exercisesCopy.length > 0) {
+    const randomExercise = getRandomExercise();
+    if(currentObjetive + randomExercise.caloriesBurn < target)
+    {
+      selectedExercises.push(randomExercise);
+      currentObjetive += randomExercise.caloriesBurn;
+    }
+  }
+
+  return selectedExercises;
+};
+
+const selectMealsToMeetObjetive = (filteredMeals, target, targetType) => {
 
   // Copia la lista de comidas para no modificar la original
   const mealsCopy = [...filteredMeals];
@@ -40,28 +75,26 @@ const selectMealsToMeetCalories = (filteredMeals, targetCalories) => {
   // Función para obtener una comida aleatoria de la lista
   const getRandomMeal = () => {
     const randomIndex = Math.floor(Math.random() * mealsCopy.length);
-    return mealsCopy[randomIndex];
+    return mealsCopy.splice(randomIndex, 1)[0]; // Elimina y retorna la comida seleccionada
   };
 
   // Inicializa variables
   let selectedMeals = [];
-  let currentCalories = 0;
+  let currentObjetive = 0;
 
   // Bucle para seleccionar comidas hasta alcanzar o superar las Calories
-  while ((currentCalories < targetCalories) && mealsCopy.length > 0) {
+  while ((currentObjetive < target) && mealsCopy.length > 0) {
     const randomMeal = getRandomMeal();
-    selectedMeals.push(randomMeal);
-    currentCalories += randomMeal.calories;
-  }
-
-  // Si nos pasamos de Calories, ajustamos eliminando la última comida seleccionada
-  while (currentCalories > targetCalories) {
-    const removedMeal = selectedMeals.pop();
-    currentCalories -= removedMeal.calories;
+    if(currentObjetive + randomMeal[targetType] < target && randomMeal[targetType]>0)
+    {
+      selectedMeals.push(randomMeal);
+      currentObjetive += randomMeal[targetType];
+    }
   }
 
   return selectedMeals;
 };
+
 
 const getPlansByUserId = async (req, res) => {
     try {

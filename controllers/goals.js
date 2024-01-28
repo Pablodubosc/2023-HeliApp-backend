@@ -57,7 +57,7 @@ const calculateGoalStatus = async (goal) => {
 };
 
 const createNewRecurrencyGoal = async (goal) => {
-  const newGoal = {"name" : goal.name, "calories": goal.calories, "userId": goal.userId, "startDate":goal.startDate, "endDate":goal.endDate, "recurrency":goal.recurrency}
+  const newGoal = {"name" : goal.name, "objetive": goal.objetive, "type":goal.type, "userId": goal.userId, "startDate":goal.startDate, "endDate":goal.endDate, "recurrency":goal.recurrency}
   await goalModel.create(newGoal);
 };
 

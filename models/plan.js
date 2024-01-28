@@ -6,13 +6,25 @@ const planSchema = new mongoose.Schema(
     name: {
       type: String,
     },
-    meals: {
+    suggestions: {
       type: [],
     },
-    calories: {
+    planType:{
+      type: String,
+      requiere: true
+    },
+    planObjetive: {
       type: Number,
       min: [0],
       required: true,
+    },
+    startDate:{
+      type: Date,
+      requiere: true
+    },
+    endDate:{
+        type: Date,
+        requiere: true
     },
     userId: {
       type: String,
