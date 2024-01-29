@@ -107,7 +107,20 @@ const getPlansByUserId = async (req, res) => {
     }
   };
 
+const updatePlanById = async (req, res) => {
+    try {
+      const data = await planModel.findOneAndUpdate(
+        { _id: req.body._id },
+        req.body
+      );
+      res.send({ data });
+    } catch (e) {
+      handleHttpError(res, "ERROR_UPDATE_PLAN", 500);
+    }
+  };
+
 module.exports = {
   createPlan,
-  getPlansByUserId
+  getPlansByUserId,
+  updatePlanById
 };
