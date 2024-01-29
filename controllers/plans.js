@@ -39,7 +39,6 @@ const createPlan = async (req, res) => {
 };
 
 const selectExerciseToMeetObjetive = (allExercises, target, targetType) => {
-  console.log("entra aca")
 
   // Copia la lista de comidas para no modificar la original
   const exercisesCopy = [...allExercises];
@@ -59,7 +58,8 @@ const selectExerciseToMeetObjetive = (allExercises, target, targetType) => {
     const randomExercise = getRandomExercise();
     if(currentObjetive + randomExercise.caloriesBurn < target)
     {
-      selectedExercises.push(randomExercise);
+      const randomExerciseWithDone = { ...randomExercise._doc, done: false };
+      selectedExercises.push(randomExerciseWithDone);
       currentObjetive += randomExercise.caloriesBurn;
     }
   }
@@ -87,7 +87,8 @@ const selectMealsToMeetObjetive = (filteredMeals, target, targetType) => {
     const randomMeal = getRandomMeal();
     if(currentObjetive + randomMeal[targetType] < target && randomMeal[targetType]>0)
     {
-      selectedMeals.push(randomMeal);
+      const randomMealWithDone = { ...randomMeal._doc, done: false };
+      selectedMeals.push(randomMealWithDone);
       currentObjetive += randomMeal[targetType];
     }
   }
