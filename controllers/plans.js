@@ -7,8 +7,8 @@ const createPlan = async (req, res) => {
     const planType = req.body.planType;
     const allMeals = await mealModel.find();
     const allExercises = await exerciseDoneModel.find();
-    const userJson = await usersModel.findOne({ _id: req.body.userId });
     if (planType != "calories burn"){
+      const userJson = await usersModel.findOne({ _id: req.body.userId });
         const allergicFoods = userJson.allergies.map(allergy => allergy.name);
 
         // Filtra las comidas que no contienen alimentos alérgicos

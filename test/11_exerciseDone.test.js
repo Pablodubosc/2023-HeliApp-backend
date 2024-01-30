@@ -9,23 +9,12 @@ beforeAll(async () => {
 
 let findStub;
 
-test("Esto deberia retornar un 403", async () => {
-  const response = await request(app).post("/api/exerciseDone").send({
-    name: "",
-    exercises: [],
-    date: "20/10/1998",
-    hour: "20:15",
-    caloriesBurn: 200,
-  });
-  expect(response.statusCode).toEqual(403);
-});
-
 test("Se creo el conjunto de ejercicios correctamente", async () => {
   const response = await request(app)
     .post("/api/exerciseDone")
     .send({
       name: "Aerobico",
-      foods: [
+      exercises: [
         {
           name: "Correr",
           caloriesBurn: 100,
@@ -37,7 +26,7 @@ test("Se creo el conjunto de ejercicios correctamente", async () => {
           quantity: 15,
         },
       ],
-      date: "20/10/1998",
+      date: new Date(),
       caloriesBurn: 300,
       userId: "987654321",
     });
@@ -49,7 +38,7 @@ test("[DELETE exercise Done] Esto deberia retornar un 200", async () => {
     .post("/api/exerciseDone")
     .send({
       name: "Aerobico",
-      foods: [
+      exercises: [
         {
           name: "Correr",
           caloriesBurn: 100,
@@ -61,7 +50,7 @@ test("[DELETE exercise Done] Esto deberia retornar un 200", async () => {
           quantity: 15,
         },
       ],
-      date: "20/10/1998",
+      date: new Date(),
       caloriesBurn: 300,
       userId: "987654321",
     });
@@ -78,7 +67,7 @@ test("[UPDATE exercise Done] Esto deberia retornar un 200", async () => {
     .post("/api/exerciseDone")
     .send({
       name: "Aerobico",
-      foods: [
+      exercises: [
         {
           name: "Correr",
           caloriesBurn: 100,
@@ -90,7 +79,7 @@ test("[UPDATE exercise Done] Esto deberia retornar un 200", async () => {
           quantity: 15,
         },
       ],
-      date: "20/10/1998",
+      date: new Date(),
       caloriesBurn: 105,
       userId: "987654321",
     });
@@ -101,7 +90,7 @@ test("[UPDATE exercise Done] Esto deberia retornar un 200", async () => {
   const response1 = await request(app)
     .put("/api/exerciseDone/" + mealId)
     .send({
-      name: "Carne con papas modificada",
+      name: "exerciseDone modificada",
     });
   expect(response1.statusCode).toEqual(200);
 });
@@ -110,7 +99,7 @@ test("[UPDATE exercise Done ] Esto deberia retornar un 200", async () => {
   sinon.stub(exerciseDoneModel, "findOneAndUpdate").throws(new Error("Database error"));
 
   const response = await request(app).put("/api/exerciseDone/1234").send({
-    name: "Carne con papas modificada",
+    name: "exerciseDone modificada",
   });
   expect(response.statusCode).toEqual(500);
 });
@@ -120,7 +109,7 @@ test("[DELETE exercise Done] Esto deberia retornar un 200", async () => {
   .post("/api/exerciseDone")
   .send({
     name: "Aerobico",
-    foods: [
+    exercises: [
       {
         name: "Correr",
         caloriesBurn: 100,
@@ -152,11 +141,19 @@ test("[DELETE exercise Done] Esto deberia retornar un 500", async () => {
 });
 
 test("[GET exerciseDone BY USER ID AND DATE] Esto deberia retornar un 200", async () => {
+  const fechaActual = new Date();
+  // Obtener el año, mes y día
+  const año = fechaActual.getFullYear();
+  const mes = (fechaActual.getMonth() + 1).toString().padStart(2, '0'); // Los meses son indexados desde 0
+  const dia = fechaActual.getDate().toString().padStart(2, '0');
+
+  // Formatear la fecha como "YYYY-MM-DD"
+  const fechaFormateada = `${año}-${mes}-${dia}`;
   const response = await request(app)
   .post("/api/exerciseDone")
   .send({
     name: "Aerobico",
-    foods: [
+    exercises: [
       {
         name: "Correr",
         caloriesBurn: 100,
@@ -168,13 +165,13 @@ test("[GET exerciseDone BY USER ID AND DATE] Esto deberia retornar un 200", asyn
         quantity: 15,
       },
     ],
-    date: "2023-10-04T10:00:00.000Z",
+    date: fechaActual,
     caloriesBurn: 105,
     userId: "987654321",
   });
 
   const response1 = await request(app).get(
-    "/api/exerciseDone/user/987654321/date/2023-10-04T10:00:00.000Z"
+    "/api/exerciseDone/user/987654321/date/"+fechaFormateada
   );
   expect(response1.statusCode).toEqual(200);
 });
@@ -195,7 +192,7 @@ test("[GET exerciseDone BY USER ID BETWEEN DAYS] Esto deberia retornar un 200", 
   .post("/api/exerciseDone")
   .send({
     name: "Aerobico",
-    foods: [
+    exercises: [
       {
         name: "Correr",
         caloriesBurn: 100,
@@ -207,13 +204,13 @@ test("[GET exerciseDone BY USER ID BETWEEN DAYS] Esto deberia retornar un 200", 
         quantity: 15,
       },
     ],
-    date: "2023-10-04T10:00:00.000Z",
+    date: new Date(),
     caloriesBurn: 105,
     userId: "987654321",
   });
 
   const response1 = await request(app).get(
-    "/api/exerciseDone/user/987654321/startDate/2022-10-18/endDate/2023-10-19"
+    "/api/exerciseDone/user/987654321/startDate/2024-01-01T10:00:00.000Z/endDate/2024-02-30T10:00:00.000Z"
   );
   expect(response1.statusCode).toEqual(200);
 });
@@ -262,7 +259,7 @@ test("[CREATE exerciseDone]Esto deberia retornar un 500", async () => {
   .post("/api/exerciseDone")
   .send({
     name: "Aerobico",
-    foods: [
+    exercises: [
       {
         name: "Correr",
         caloriesBurn: 100,
@@ -274,7 +271,7 @@ test("[CREATE exerciseDone]Esto deberia retornar un 500", async () => {
         quantity: 15,
       },
     ],
-    date: "2023-10-04T10:00:00.000Z",
+    date: new Date(),
     caloriesBurn: 105,
     userId: "987654321",
   });

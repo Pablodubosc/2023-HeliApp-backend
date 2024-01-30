@@ -40,7 +40,6 @@ const getExerciseDoneByUserIdAndDate = async (req, res) => {
 
 const createExerciseDone = async (req, res) => {
   try {
-    console.log("ENTRA ACA"+JSON.stringify(req.body))
     const data = await exerciseDoneModel.create(req.body);
     res.send({ data });
   } catch (e) {

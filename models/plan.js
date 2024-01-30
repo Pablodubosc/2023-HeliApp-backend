@@ -5,26 +5,26 @@ const planSchema = new mongoose.Schema(
   {
     name: {
       type: String,
+      required: true
     },
     suggestions: {
       type: [],
     },
     planType:{
       type: String,
-      requiere: true
+      required: true
     },
     planObjetive: {
       type: Number,
       min: [0],
-      required: true,
+      required: true
     },
     startDate:{
       type: Date,
-      requiere: true
+      required: true
     },
     endDate:{
-        type: Date,
-        requiere: true
+      type: Date,
     },
     userId: {
       type: String,

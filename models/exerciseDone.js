@@ -7,7 +7,16 @@ const exerciseDoneSchema = new mongoose.Schema(
       type: String,
     },
     exercises: {
-      type: [],
+      type: [
+        { type: mongoose.Schema.Types.Mixed, ref: "exercise", required: true },
+      ],
+      required: true,
+      validate: {
+        validator: function (array) {
+          return array.length > 0;
+        },
+        message: "El array debe contener al menos un elemento.",
+      },
     },
     date: {
       type: Date,
