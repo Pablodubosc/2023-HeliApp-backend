@@ -37,9 +37,12 @@ test("Se creo la comida correctamente", async () => {
           quantity: 1,
         },
       ],
-      date: "20/10/1998",
+      date: new Date(),
       hour: "20:15",
       calories: 200,
+      carbs:10,
+      proteins:10,
+      fats:10,
       userId: "987654321",
     });
   expect(response.statusCode).toEqual(200);
@@ -62,7 +65,7 @@ test("[DELETE MEAL] Esto deberia retornar un 200", async () => {
           quantity: 1,
         },
       ],
-      date: "20/10/1998",
+      date: new Date(),
       hour: "20:15",
       calories: 200,
       userId: "987654321",
@@ -92,7 +95,7 @@ test("[UPDATE MEAL] Esto deberia retornar un 200", async () => {
           quantity: 1,
         },
       ],
-      date: "20/10/1998",
+      date: new Date(),
       hour: "20:15",
       calories: 200,
       userId: "987654321",
@@ -135,7 +138,7 @@ test("[DELETE MEAL] Esto deberia retornar un 200", async () => {
           quantity: 1,
         },
       ],
-      date: "20/10/1998",
+      date: new Date(),
       hour: "20:15",
       calories: 200,
       userId: "987654321",
@@ -172,14 +175,14 @@ test("[GET MEALS BY USER ID AND DATE] Esto deberia retornar un 200", async () =>
           quantity: 1,
         },
       ],
-      date: "2023-10-04T10:00:00.000Z",
+      date: new Date(),
       hour: "20:15",
       calories: 200,
       userId: "987654321",
     });
 
   const response1 = await request(app).get(
-    "/api/meals/user/987654321/date/2023-10-04T10:00:00.000Z"
+    "/api/meals/user/987654321/date/Mon Jan 29 2024 00:00:00 GMT-0300 (hora estándar de Argentina)",
   );
   expect(response1.statusCode).toEqual(200);
 });
@@ -201,15 +204,17 @@ test("[GET CALORIES BY USER ID AND MONTH] Esto deberia retornar un 200", async (
           quantity: 1,
         },
       ],
-      date: "2023-10-04T10:00:00.000Z",
+      date: new Date(),
       hour: "20:15",
       calories: 200,
       userId: "987654321",
     });
-
+    const startDate = encodeURI("Mon Jan 29 2024 00:00:00 GMT-0300 (hora estándar de Argentina)")
+    const endDate = encodeURI("Mon Feb 05 2024 00:00:52 GMT-0300 (hora estándar de Argentina)")
   const response1 = await request(app).get(
-    "/api/meals/user/987654321/between/2022-10-18/2023-10-19"
+    "/api/meals/user/987654321/between/"+startDate+"/"+endDate
   );
+  console.log("respuesta" + JSON.stringify(response1))
   expect(response1.statusCode).toEqual(200);
 });
 
@@ -240,14 +245,14 @@ test("[GET CALORIES BY USER ID BETWEEN DAYS] Esto deberia retornar un 200", asyn
           quantity: 1,
         },
       ],
-      date: "2023-10-04T10:00:00.000Z",
+      date: new Date(),
       hour: "20:15",
       calories: 200,
       userId: "987654321",
     });
 
   const response1 = await request(app).get(
-    "/api/meals/user/987654321/startDate/2022-10-18/endDate/2023-10-19"
+    "/api/meals/user/987654321/startDate/2022-01-30T21:29:57.955Z/endDate/2025-01-30T21:29:57.955Z"
   );
   expect(response1.statusCode).toEqual(200);
 });
@@ -308,7 +313,7 @@ test("[CREATE MEAL]Esto deberia retornar un 500", async () => {
           quantity: 1,
         },
       ],
-      date: "20/10/1998",
+      date: new Date(),
       hour: "20:15",
       calories: 200,
       userId: "987654321",
