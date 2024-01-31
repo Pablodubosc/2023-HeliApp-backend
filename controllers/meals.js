@@ -1,4 +1,4 @@
-const { mealModel, usersModel } = require("../models");
+const { mealModel, usersModel, foodModel } = require("../models");
 const { handleHttpError } = require("../utils/handleErrors");
 
 const getMeals = async (req, res) => {
@@ -39,6 +39,15 @@ const getMealsByUserIdAndDate = async (req, res) => {
 
 const createMeal = async (req, res) => {
   try {
+    const foods = req.body.foods
+    const isValidMeal = foods.every((food) => {
+      const f = new foodModel(food);
+      return f.validateSync() === undefined;
+    });
+    if (!isValidMeal) {
+      handleHttpError(res, "ERROR_INVALID_MEAL_FORMAT", 400);
+      return;
+    }
     const data = await mealModel.create(req.body);
     res.send({ data });
   } catch (e) {

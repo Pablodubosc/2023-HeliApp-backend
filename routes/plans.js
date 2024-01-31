@@ -5,9 +5,9 @@ const {
   getPlansByUserId,
   updatePlanById
 } = require("../controllers/plans");
+const { validatorCreatePlan } = require("../validators/plans");
 
-
-router.post("/",createPlan)
+router.post("/",validatorCreatePlan,createPlan)
 router.get("/:id",getPlansByUserId)
 router.put("/",updatePlanById)
 

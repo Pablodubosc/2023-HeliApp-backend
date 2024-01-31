@@ -28,13 +28,15 @@ test("Se creo la comida correctamente", async () => {
       foods: [
         {
           name: "Papa",
-          calories: "10",
-          quantity: 1,
+          calories: 10,
+          weight: 1,
+          category : "Verdura"
         },
         {
           name: "Lomo",
-          calories: "20",
-          quantity: 1,
+          calories: 20,
+          weight: 1,
+          category : "Carne"
         },
       ],
       date: new Date(),
@@ -56,18 +58,23 @@ test("[DELETE MEAL] Esto deberia retornar un 200", async () => {
       foods: [
         {
           name: "Papa",
-          calories: "10",
-          quantity: 1,
+          calories: 10,
+          weight: 1,
+          category : "Verdura"
         },
         {
           name: "Lomo",
-          calories: "20",
-          quantity: 1,
+          calories: 20,
+          weight: 1,
+          category : "Carne"
         },
       ],
       date: new Date(),
       hour: "20:15",
       calories: 200,
+      carbs:10,
+      proteins:10,
+      fats:10,
       userId: "987654321",
     });
 
@@ -86,18 +93,23 @@ test("[UPDATE MEAL] Esto deberia retornar un 200", async () => {
       foods: [
         {
           name: "Papa",
-          calories: "10",
-          quantity: 1,
+          calories: 10,
+          weight: 1,
+          category : "Verdura"
         },
         {
           name: "Lomo",
-          calories: "20",
-          quantity: 1,
+          calories: 20,
+          weight: 1,
+          category : "Carne"
         },
       ],
       date: new Date(),
       hour: "20:15",
       calories: 200,
+      carbs:10,
+      proteins:10,
+      fats:10,
       userId: "987654321",
     });
 
@@ -129,18 +141,23 @@ test("[DELETE MEAL] Esto deberia retornar un 200", async () => {
       foods: [
         {
           name: "Papa",
-          calories: "10",
-          quantity: 1,
+          calories: 10,
+          weight: 1,
+          category : "Verdura"
         },
         {
           name: "Lomo",
-          calories: "20",
-          quantity: 1,
+          calories: 20,
+          weight: 1,
+          category : "Carne"
         },
       ],
       date: new Date(),
       hour: "20:15",
       calories: 200,
+      carbs:10,
+      proteins:10,
+      fats:10,
       userId: "987654321",
     });
 
@@ -174,18 +191,23 @@ test("[GET MEALS BY USER ID AND DATE] Esto deberia retornar un 200", async () =>
       foods: [
         {
           name: "Papa",
-          calories: "10",
-          quantity: 1,
+          calories: 10,
+          weight: 1,
+          category : "Verdura"
         },
         {
           name: "Lomo",
-          calories: "20",
-          quantity: 1,
+          calories: 20,
+          weight: 1,
+          category : "Carne"
         },
       ],
-      date: fechaActual,
+      date: new Date(),
       hour: "20:15",
       calories: 200,
+      carbs:10,
+      proteins:10,
+      fats:10,
       userId: "987654321",
     });
 
@@ -197,26 +219,31 @@ test("[GET MEALS BY USER ID AND DATE] Esto deberia retornar un 200", async () =>
 
 test("[GET CALORIES BY USER ID AND MONTH] Esto deberia retornar un 200", async () => {
   const response = await request(app)
-    .post("/api/meals")
-    .send({
-      name: "Carne con papas",
-      foods: [
-        {
-          name: "Papa",
-          calories: "10",
-          quantity: 1,
-        },
-        {
-          name: "Lomo",
-          calories: "20",
-          quantity: 1,
-        },
-      ],
-      date: new Date(),
-      hour: "20:15",
-      calories: 200,
-      userId: "987654321",
-    });
+  .post("/api/meals")
+  .send({
+    name: "Carne con papas",
+    foods: [
+      {
+        name: "Papa",
+        calories: 10,
+        weight: 1,
+        category : "Verdura"
+      },
+      {
+        name: "Lomo",
+        calories: 20,
+        weight: 1,
+        category : "Carne"
+      },
+    ],
+    date: new Date(),
+    hour: "20:15",
+    calories: 200,
+    carbs:10,
+    proteins:10,
+    fats:10,
+    userId: "987654321",
+  });
     const startDate = encodeURI("Mon Jan 29 2024 00:00:00 GMT-0300 (hora estándar de Argentina)")
 
     const endDate = encodeURI("Mon Feb 12 2024 00:00:52 GMT-0300 (hora estándar de Argentina)")
@@ -245,18 +272,23 @@ test("[GET CALORIES BY USER ID BETWEEN DAYS] Esto deberia retornar un 200", asyn
       foods: [
         {
           name: "Papa",
-          calories: "10",
-          quantity: 1,
+          calories: 10,
+          weight: 1,
+          category : "Verdura"
         },
         {
           name: "Lomo",
-          calories: "20",
-          quantity: 1,
+          calories: 20,
+          weight: 1,
+          category : "Carne"
         },
       ],
       date: new Date(),
       hour: "20:15",
       calories: 200,
+      carbs:10,
+      proteins:10,
+      fats:10,
       userId: "987654321",
     });
 
@@ -316,18 +348,23 @@ test("[CREATE MEAL]Esto deberia retornar un 500", async () => {
       foods: [
         {
           name: "Papa",
-          calories: "10",
-          quantity: 1,
+          calories: 10,
+          weight: 1,
+          category : "Verdura"
         },
         {
           name: "Lomo",
-          calories: "20",
-          quantity: 1,
+          calories: 20,
+          weight: 1,
+          category : "Carne"
         },
       ],
       date: new Date(),
       hour: "20:15",
       calories: 200,
+      carbs:10,
+      proteins:10,
+      fats:10,
       userId: "987654321",
     });
 

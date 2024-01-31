@@ -5,28 +5,24 @@ const mealSchema = new mongoose.Schema(
   {
     name: {
       type: String,
+      required: true,
     },
     foods: {
-      type: [
-        { type: mongoose.Schema.Types.Mixed, ref: "food", required: true },
-      ],
+      type: [],
       required: true,
-      validate: {
-        validator: function (array) {
-          return array.length > 0;
-        },
-        message: "El array debe contener al menos un elemento.",
-      },
     },
     date: {
       type: Date,
+      required: true,
     },
     hour: {
       type: String,
+      required: true,
     },
     calories: {
       type: Number,
-      min: [0]
+      min: [0],
+      required: true,
     },
     carbs: {
       type: Number,

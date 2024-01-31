@@ -1,4 +1,6 @@
-const { exerciseDoneModel } = require("../models");
+const { exerciseDoneModel, exerciseModel } = require("../models");
+const exercise = require("../models/exercise");
+const exerciseDone = require("../models/exerciseDone");
 const { handleHttpError } = require("../utils/handleErrors");
 
 const getExerciseDone = async (req, res) => {
@@ -40,6 +42,15 @@ const getExerciseDoneByUserIdAndDate = async (req, res) => {
 
 const createExerciseDone = async (req, res) => {
   try {
+    const exercises = req.body.exercises
+    const isValidExerciseDone = exercises.every((exercise) => {
+      const exer = new exerciseModel(exercise);
+      return exer.validateSync() === undefined;
+    });
+    if (!isValidExerciseDone) {
+      handleHttpError(res, "ERROR_INVALID_EXERCISE_FORMAT", 400);
+      return;
+    }
     const data = await exerciseDoneModel.create(req.body);
     res.send({ data });
   } catch (e) {

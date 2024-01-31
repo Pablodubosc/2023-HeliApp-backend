@@ -35,21 +35,7 @@ test("Se creo el plan correctamente", async() => {
     .post("/api/plans")
     .send({
       name: "plan ejercicios",
-      suggestions: [{
-        name: "Aerobico",
-        exercises: [
-          {
-            name: "Correr",
-            caloriesBurn: 100,
-            time: 10,
-          },
-          {
-            name: "Saltar la soga",
-            calories: 5,
-            time: 15,
-          }
-        ]
-      }],
+      suggestions: [],
       planType: "calories burn",
       planObjetive: 200,
       startDate: new Date(),
@@ -65,21 +51,7 @@ test("[UPDATE plan] Esto deberia retornar un 200", async () => {
     .post("/api/plans")
     .send({
       name: "plan ejercicios",
-      suggestions: [{
-        name: "Aerobico",
-        exercises: [
-          {
-            name: "Correr",
-            caloriesBurn: 100,
-            time: 10,
-          },
-          {
-            name: "Saltar la soga",
-            calories: 5,
-            time: 15,
-          }
-        ]
-      }],
+      suggestions: [],
       planType: "calories burn",
       planObjetive: 200,
       startDate: new Date(),
@@ -133,21 +105,7 @@ test("[CREATE plan]Esto deberia retornar un 500", async () => {
     .post("/api/plans")
     .send({
       name: "plan ejercicios",
-      suggestions: [{
-        name: "Aerobico",
-        exercises: [
-          {
-            name: "Correr",
-            caloriesBurn: 100,
-            time: 10,
-          },
-          {
-            name: "Saltar la soga",
-            calories: 5,
-            time: 15,
-          }
-        ]
-      }],
+      suggestions: [],
       planType: "calories burn",
       planObjetive: "AA",
       startDate: new Date(),

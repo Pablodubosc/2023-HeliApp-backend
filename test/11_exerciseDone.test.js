@@ -14,10 +14,32 @@ test("Se creo el conjunto de ejercicios correctamente", async () => {
     .post("/api/exerciseDone")
     .send({
       name: "Aerobico",
+      exercises: [ 
+        {
+          name:"Ejercicio1",
+          caloriesBurn:10,
+          time: 10,
+      },{
+        name:"Ejercicio2",
+        caloriesBurn:100,
+        time: 100,
+    }],
+      date: new Date(),
+      caloriesBurn: 300,
+      userId: "987654321",
+    });
+  expect(response.statusCode).toEqual(200);
+});
+
+test("Deberia retornar 500 porque esta mal un exercise", async () => {
+  const response = await request(app)
+    .post("/api/exerciseDone")
+    .send({
+      name: "Aerobico",
       exercises: [
         {
           name: "Correr",
-          caloriesBurn: 100,
+          caloriesBurn: "aASDAD",
           time: 10,
         },
         {
@@ -30,7 +52,7 @@ test("Se creo el conjunto de ejercicios correctamente", async () => {
       caloriesBurn: 300,
       userId: "987654321",
     });
-  expect(response.statusCode).toEqual(200);
+  expect(response.statusCode).toEqual(400);
 });
 
 test("[DELETE exercise Done] Esto deberia retornar un 200", async () => {
@@ -46,8 +68,8 @@ test("[DELETE exercise Done] Esto deberia retornar un 200", async () => {
         },
         {
           name: "Saltar la soga",
-          calories: 200,
-          quantity: 15,
+          caloriesBurn: 200,
+          time: 15,
         },
       ],
       date: new Date(),
@@ -75,8 +97,8 @@ test("[UPDATE exercise Done] Esto deberia retornar un 200", async () => {
         },
         {
           name: "Saltar la soga",
-          calories: 5,
-          quantity: 15,
+          caloriesBurn: 5,
+          time: 15,
         },
       ],
       date: new Date(),
@@ -117,8 +139,8 @@ test("[DELETE exercise Done] Esto deberia retornar un 200", async () => {
       },
       {
         name: "Saltar la soga",
-        calories: 5,
-        quantity: 15,
+        caloriesBurn: 5,
+        time: 15,
       },
     ],
     date: "2023-10-04T10:00:00.000Z",
@@ -161,8 +183,8 @@ test("[GET exerciseDone BY USER ID AND DATE] Esto deberia retornar un 200", asyn
       },
       {
         name: "Saltar la soga",
-        calories: 5,
-        quantity: 15,
+        caloriesBurn: 5,
+        time: 15,
       },
     ],
     date: fechaActual,
@@ -200,8 +222,8 @@ test("[GET exerciseDone BY USER ID BETWEEN DAYS] Esto deberia retornar un 200", 
       },
       {
         name: "Saltar la soga",
-        calories: 5,
-        quantity: 15,
+        caloriesBurn: 5,
+        time: 15,
       },
     ],
     date: new Date(),
@@ -267,8 +289,8 @@ test("[CREATE exerciseDone]Esto deberia retornar un 500", async () => {
       },
       {
         name: "Saltar la soga",
-        calories: 5,
-        quantity: 15,
+        caloriesBurn: 5,
+        time: 15,
       },
     ],
     date: new Date(),
