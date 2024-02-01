@@ -23,11 +23,20 @@ const createPlan = async (req, res) => {
 
         const selectedMeals = selectMealsToMeetObjetive(filteredMeals, planObjetive, planType);
 
+        if (selectedMeals.length === 0) {
+          handleHttpError(res, "ERROR_NO_MEALS_FOUND_FOR_PLAN", 400);
+          return;
+        }
+
         req.body.suggestions = selectedMeals;         
     }
     else{
       const selectedExercise = selectExerciseToMeetObjetive(allExercises,planObjetive, planType);
 
+      if (selectedExercise.length === 0) {
+        handleHttpError(res, "ERROR_NO_EXERCISE_FOUND_FOR_PLAN", 400);
+        return;
+      }
       req.body.suggestions = selectedExercise; 
     }
 
@@ -56,7 +65,7 @@ const selectExerciseToMeetObjetive = (allExercises, target, targetType) => {
   // Bucle para seleccionar comidas hasta alcanzar o superar las Calories
   while ((currentObjetive < target) && exercisesCopy.length > 0) {
     const randomExercise = getRandomExercise();
-    if(currentObjetive + randomExercise.caloriesBurn < target)
+    if(currentObjetive + randomExercise.caloriesBurn <= target)
     {
       const randomExerciseWithDone = { ...randomExercise._doc, done: false };
       selectedExercises.push(randomExerciseWithDone);
@@ -85,7 +94,7 @@ const selectMealsToMeetObjetive = (filteredMeals, target, targetType) => {
   // Bucle para seleccionar comidas hasta alcanzar o superar las Calories
   while ((currentObjetive < target) && mealsCopy.length > 0) {
     const randomMeal = getRandomMeal();
-    if(currentObjetive + randomMeal[targetType] < target && randomMeal[targetType]>0)
+    if(currentObjetive + randomMeal[targetType] <= target && randomMeal[targetType]>0)
     {
       const randomMealWithDone = { ...randomMeal._doc, done: false };
       selectedMeals.push(randomMealWithDone);
