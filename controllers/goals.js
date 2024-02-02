@@ -1,5 +1,5 @@
 const { ObjectId } = require("mongodb");
-const { goalModel,mealModel } = require("../models");
+const { goalModel,mealModel, exerciseDoneModel } = require("../models");
 const { handleHttpError } = require("../utils/handleErrors");
 
 const getGoalsByUserId = async (req, res) => {
@@ -57,7 +57,7 @@ const calculateGoalStatus = async (goal) => {
 };
 
 const createNewRecurrencyGoal = async (goal) => {
-  const newGoal = {"name" : goal.name, "calories": goal.calories, "userId": goal.userId, "startDate":goal.startDate, "endDate":goal.endDate, "recurrency":goal.recurrency}
+  const newGoal = {"name" : goal.name, "objetive": goal.objetive, "type":goal.type, "userId": goal.userId, "startDate":goal.startDate, "endDate":goal.endDate, "recurrency":goal.recurrency}
   await goalModel.create(newGoal);
 };
 
@@ -72,22 +72,41 @@ const getGoalsByUserWithProgress = async(req,res) => {
         userId: userId,
         date: { $gte: startDate, $lte: endDate },
       };
-    
-      const result = await mealModel.find(filter);
-      let totalCalorias = 0;
-      result.forEach((record) => {
-        totalCalorias += record.calories;
-      });
+      const goalType = item.type;
+      if(goalType == "calories burn"){
+        const result = await exerciseDoneModel.find(filter);
+        let totalConsumido = 0;
+        result.forEach((record) => {
+          totalConsumido += record.caloriesBurn;
+        });
 
-      const state = await calculateGoalStatus(item)
-    
-      const newItem = {
-        ...item.toObject(),
-        totalCalorias: totalCalorias,
-        state : state
-      };
-    
-      return newItem;
+        const state = await calculateGoalStatus(item)
+      
+        const newItem = {
+          ...item.toObject(),
+          totalConsumido: totalConsumido,
+          state : state
+        };
+      
+        return newItem;
+      }
+      else{
+        const result = await mealModel.find(filter);
+        let totalConsumido = 0;
+        result.forEach((record) => {
+          totalConsumido += record[goalType];
+        });
+
+        const state = await calculateGoalStatus(item)
+      
+        const newItem = {
+          ...item.toObject(),
+          totalConsumido: totalConsumido,
+          state : state
+        };
+      
+        return newItem;
+    }
     }));
     res.send({ goalsWithProgress });
   } catch (e) {

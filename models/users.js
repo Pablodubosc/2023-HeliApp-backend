@@ -30,6 +30,10 @@ const userSchema = new mongoose.Schema(
         weight:{
             type: Number,
         },
+        allergies: {
+            type: [],
+            default: [{ name: ""}],
+          },
         role: {
             type: String,
             enum: ["user", "admin", "nutritionist"]
