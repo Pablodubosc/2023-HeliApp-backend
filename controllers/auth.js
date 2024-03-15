@@ -52,27 +52,10 @@ const loginController = async (req, res) => {
     }
 }
 
-const getUsers = async (req, res) => {
-    try{
-        const data = await usersModel.find({});
-        res.send({data});        
-    } catch(e){
-        handleHttpError(res, 'ERROR_GET_USERS', 500);
-    }
-}
-
-const getNutritionistUsers = async (req, res) => {
-    try{
-        const data = await usersModel.find({role: 'nutritionist'});
-        res.send({data});        
-    } catch(e){
-        handleHttpError(res, 'ERROR_GET_NUTRITIONIST_USERS', 500);
-    }
-}
-
 const getUser = async (req, res) => {
     try{
-        const data = await usersModel.findById(req.params.id);
+        const userId = req.userId
+        const data = await usersModel.findById(userId);
         res.send({data});    
 
     } catch(e){
@@ -92,11 +75,12 @@ const getUserByEmail = async (req, res) => {
 
 const updateUserPassword = async (req, res) => {
     try{
+        const userId = req.userId
         const newPassword = req.body.password;
         const password = await encrypt(newPassword);
 
         const data = await usersModel.findOneAndUpdate(
-            { "_id": req.params.id }, {"password": password}
+            { "_id": userId }, {"password": password}
         );
         res.send({data});
         res.status(200)
@@ -107,8 +91,9 @@ const updateUserPassword = async (req, res) => {
 
 const updateUser = async (req, res) => {
     try{
+        const userId = req.userId
         const data = await usersModel.findOneAndUpdate(
-            { "_id": req.params.id }, req.body
+            { "_id": userId }, req.body
         );
         res.send({data});
         res.status(200)
@@ -121,43 +106,12 @@ const updateUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
     try{
-        const data = await usersModel.delete({_id:req.params.id});;
+        const userId = req.userId
+        const data = await usersModel.delete({_id:userId});;
         res.send({data});
     } catch(e){
         handleHttpError(res, 'ERROR_DELETE_USER', 500);
     }
 }
 
-const updateNutritionist = async (req, res) => {
-    try{
-        const data = await usersModel.findByIdAndUpdate(
-            req.params.id, {"nutritionist": req.body.nutritionistId}
-        );
-        res.send({data});
-        res.status(200)
-    } catch(e){
-        handleHttpError(res, 'ERROR_UPDATE_NUTRITIONIST', 500);
-    }
-}
-
-const getNutritionistByUserId = async (req, res) => {
-    try{
-        const data = await usersModel.findById(req.params.id).populate('nutritionist');
-        res.send({data});    
-    } catch(e){
-        console.log(e);
-        handleHttpError(res, 'ERROR_GET_NUTRITIONIST_BY_USER_ID', 500);
-    }
-}
-
-const getPatientsByNutritionistId = async (req, res) => {
-    try {
-        const data = await usersModel.find({ nutritionist: req.params.id });
-        res.json({data});
-      } catch (e) {
-        console.log(e);
-        handleHttpError(res, 'ERROR_GET_PATIENTS_BY_NUTRITIONIST_ID', 500);
-      }
-}
-
-module.exports = { registerController, loginController, getUsers, getNutritionistUsers, getUser, getUserByEmail, deleteUser, updateUserPassword, updateUser, updateNutritionist, getNutritionistByUserId, getPatientsByNutritionistId };
+module.exports = { registerController, loginController, getUser, getUserByEmail, deleteUser, updateUserPassword, updateUser };

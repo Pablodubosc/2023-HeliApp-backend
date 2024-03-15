@@ -57,8 +57,18 @@ const createMeal = async (req, res) => {
 
 const updateMealById = async (req, res) => {
   try {
-    const data = await mealModel.findOneAndUpdate(
-      { _id: req.params.id },
+    const userId = req.userId;
+    const mealId = req.params.id;
+
+    // Primero, verificamos si la comida pertenece al usuario actual
+    const meal = await mealModel.findOne({ _id: mealId, userId: userId });
+    if (!meal) {
+      return handleHttpError(res, "Meal not found or unauthorized", 404);
+    }
+
+    // Si la comida pertenece al usuario, procedemos a actualizarla
+    const updatedMeal = await mealModel.findOneAndUpdate(
+      { _id: mealId },
       req.body
     );
     res.send({ data });
@@ -69,8 +79,25 @@ const updateMealById = async (req, res) => {
 
 const deleteMealById = async (req, res) => {
   try {
-    const data = await mealModel.delete({ _id: req.params.id });
-    res.send({ data });
+    // Obtener el userId de la solicitud
+    const userId = req.userId;
+
+    // Obtener la meal por el _id
+    const mealToDelete = await mealModel.findOne({ _id: req.params.id });
+
+    // Verificar si la meal existe y si el userId coincide
+    if (!mealToDelete || mealToDelete.userId !== userId) {
+      return res
+        .status(403)
+        .json({ message: "No tienes permiso para borrar esta meal." });
+    }
+
+    // Borrar la meal si todo está bien
+    const deletedMeal = await mealModel.deleteOne({ _id: req.params.id });
+
+    res
+      .status(200)
+      .json({ message: "Meal borrada exitosamente", data: deletedMeal });
   } catch (e) {
     handleHttpError(res, "ERROR_DELETE_MEAL", 500);
   }

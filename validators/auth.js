@@ -27,10 +27,7 @@ const validatorRegisterUser = [
     .notEmpty(),
     check('weight')
     .exists()
-    .notEmpty(),    
-    check('role')
-    .exists()
-    .notEmpty(),    
+    .notEmpty(),       
     (req, res, next) => {
         return validateResults(req, res, next);
     }  

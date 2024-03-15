@@ -4,7 +4,6 @@ const { handleHttpError } = require('../utils/handleErrors');
 
 const getCategories = async (req, res) => {
     try{
-        const user = req.user;
         const data = await categoryModel.find({});
         res.send({ data, user });        
     } catch(e){

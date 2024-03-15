@@ -4,7 +4,11 @@ const { handleHttpError } = require("../utils/handleErrors");
 
 const getGoalsByUserId = async (req, res) => {
   try {
-    const data = await goalModel.find({ userId: req.params.userId });
+    const userId = req.userId;
+    if (!userId) {
+      return handleHttpError(res, "User ID not provided", 400);
+    }
+    const data = await goalModel.find({ userId: userId });
     res.send({ data });
   } catch (e) {
     handleHttpError(res, "ERROR_GET_GOALS_BY_USER_ID", 500);
@@ -13,7 +17,11 @@ const getGoalsByUserId = async (req, res) => {
 
 const getActiveGoalsByUserId = async (req, res) => {
   try {
-    const data = await goalModel.find({ userId: req.params.userId });
+    const userId = req.userId;
+    if (!userId) {
+      return handleHttpError(res, "User ID not provided", 400);
+    }
+    const data = await goalModel.find({ userId: userId });
     const filteredData = data.filter(
       (item) => new Date() >= item.startDate && new Date() <= item.endDate
     );
@@ -116,7 +124,11 @@ const getGoalsByUserWithProgress = async(req,res) => {
 
 const createGoal = async (req, res) => {
   try {
-    const data = await goalModel.create(req.body);
+    const userId = req.userId;
+    if (!userId) {
+      return handleHttpError(res, "User ID not provided", 400);
+    }
+    const data = await goalModel.create({ ...req.body, userId: userId });
     res.send({ data });
   } catch (e) {
     handleHttpError(res, "ERROR_CREATE_GOAL", 500);
@@ -126,8 +138,16 @@ const createGoal = async (req, res) => {
 
 const updateGoal = async (req, res) => {
   try {
+    const userId = req.userId;
+    const goalId = req.params.goalId;
+
+    // Primero, verificamos si el objetivo pertenece al usuario actual
+    const goal = await goalModel.findOne({ _id: goalId, userId: userId });
+    if (!goal) {
+      return handleHttpError(res, "Goal not found or unauthorized", 404);
+    }
     const data = await goalModel.findOneAndUpdate(
-      { _id: req.params.goalId },
+      { _id: goalId},
       req.body
     );
     res.send({ data });
@@ -138,7 +158,16 @@ const updateGoal = async (req, res) => {
 
 const deleteGoal = async (req, res) => {
   try {
-    const data = await goalModel.delete({ _id: req.params.goalId });
+    const userId = req.userId;
+    const goalId = req.params.goalId;
+
+    // Primero, verificamos si el objetivo pertenece al usuario actual
+    const goal = await goalModel.findOne({ _id: goalId, userId: userId });
+    if (!goal) {
+      return handleHttpError(res, "Goal not found or unauthorized", 404);
+    }
+    // Si el objetivo pertenece al usuario, procedemos a eliminarlo
+    const data = await goalModel.deleteOne({ _id: goalId });
     res.send({ data });
   } catch (e) {
     handleHttpError(res, "ERROR_DELETE_GOAL", 500);

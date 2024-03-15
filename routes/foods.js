@@ -8,13 +8,16 @@ const {
   getFoodsByCategoryWithOutAllergies
 } = require("../controllers/foods");
 const { validatorCreateFood } = require("../validators/foods");
+const { verifyToken } = require("../utils/handleJWT");
 //const authMiddleware = require('../middleware/sessionMiddleware');
 //const checkRol = require('../middleware/role');
 
-router.get("/", getFoods);
-router.get("/:id", getFoodsWithOutAllergies);
-router.get("/category/:categoryName", getFoodsByCategory);
-router.get("/category/:categoryName/:id", getFoodsByCategoryWithOutAllergies);
-router.post("/", validatorCreateFood, createFood);
+router.get("/",verifyToken, getFoods);
+// el de abajo editarlo
+router.get("/:id",verifyToken, getFoodsWithOutAllergies);
+router.get("/category/:categoryName",verifyToken, getFoodsByCategory);
+// el de abajo editarlo
+router.get("/category/:categoryName/:id",verifyToken, getFoodsByCategoryWithOutAllergies);
+router.post("/", validatorCreateFood,verifyToken, createFood);
 
 module.exports = router;

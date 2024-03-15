@@ -5,14 +5,17 @@ const { Schema } = mongoose;
 const userSchema = new mongoose.Schema(
     {
         firstName:{
-            type: String,            
+            type: String,
+            required: true,            
         },
         lastName:{
-            type: String
+            type: String,
+            required: true,
         },
         email:{
             type: String,
-            unique: true
+            required: true,
+            unique: true,
         },
         password:{
             type: String,
@@ -20,28 +23,24 @@ const userSchema = new mongoose.Schema(
         },
         sex:{
             type: String,
+            required: true,
         },
         age:{
             type: Number,
+            required: true,
         },
         height:{
             type: Number,
+            required: true,
         },
         weight:{
             type: Number,
+            required: true,
         },
         allergies: {
             type: [],
             default: [{ name: ""}],
           },
-        role: {
-            type: String,
-            enum: ["user", "admin", "nutritionist"]
-        },
-        nutritionist: {
-            type: Schema.Types.ObjectId,
-            ref: 'users'
-        },
         secretToken:{
             type: String
         }

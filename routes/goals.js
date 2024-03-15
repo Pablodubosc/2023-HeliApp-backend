@@ -8,12 +8,17 @@ const {
   getActiveGoalsByUserId,
   getGoalsByUserWithProgress
 } = require("../controllers/goals");
+const { verifyToken } = require("../utils/handleJWT");
+const extractUserIdMiddleware = require("../utils/handleUserId");
 
-router.get("/:userId", getGoalsByUserId);
-router.get("/activeGoals/:userId", getActiveGoalsByUserId);
-router.get("/goalsWithProgress/:userId",getGoalsByUserWithProgress)
-router.post("/", createGoal);
-router.put("/:goalId", updateGoal);
-router.delete("/:goalId", deleteGoal);
+
+router.get("/:userId",verifyToken, extractUserIdMiddleware, getGoalsByUserId);
+router.get("/activeGoals/", verifyToken,
+extractUserIdMiddleware, getActiveGoalsByUserId);
+router.get("/goalsWithProgress/", verifyToken,
+extractUserIdMiddleware,getGoalsByUserWithProgress)
+router.post("/",extractUserIdMiddleware, createGoal);
+router.put("/:goalId",extractUserIdMiddleware, updateGoal);
+router.delete("/:goalId",extractUserIdMiddleware, deleteGoal);
 
 module.exports = router;
