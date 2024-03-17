@@ -4,16 +4,16 @@ const validateResults = require("../utils/handleValidator")
 const validatorCreateFood = [
     check("name")
     .exists()
-    .notEmpty(),
+    .notEmpty().withMessage("Name cant be empty"),
     check('calories')
     .exists()
-    .notEmpty(),
+    .notEmpty().withMessage("Calories cant be empty"),
     check('weight')
     .exists()
-    .notEmpty(),
+    .notEmpty().withMessage("Weight cant be empty"),
     check('category')
     .exists()
-    .notEmpty(),
+    .notEmpty().withMessage("Category cant be empty"),
     (req, res, next) => {
         if (req.body.carbs === "") {
             req.body.carbs = 0;

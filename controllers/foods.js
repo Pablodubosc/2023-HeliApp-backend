@@ -57,7 +57,7 @@ const getFoodsByCategoryWithOutAllergies = async (req, res) => {
 const createFood = async (req, res) => {
   try {
     const data = await foodModel.create(req.body);
-    res.send({ data });
+    res.status(200).send({ message: 'Food create succesfully', foodId : data._id });
   } catch (e) {
     handleHttpError(res, "ERROR_CREATE_FOOD", 500);
   }
