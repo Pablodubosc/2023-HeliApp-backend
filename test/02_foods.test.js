@@ -5,9 +5,8 @@ const { usersModel } = require("../models");
 
 
 beforeAll(async () => {
-    await usersModel.deleteMany({});
     await foodModel.deleteMany({});
-});
+  });
 
 async function generateToken() {
    const response = await request(app).post("/api/auth/register").send({ // se registra
@@ -124,11 +123,50 @@ test("A food can't be created without a name", async () => {
     const foodId = response.body.foodId;
     const food = await foodModel.findById(foodId);
     expect(food).toBeTruthy(); // que es tobetruthy?
+    expect(food.name).toEqual("Rucula")
   });
 
 
-  // como hacemos el test de category? deberia recorrer todas las que devuelve 
-  //y que verifique las categorias...
+  test("User create a food with cateogry 'Carne' and a food with cateogry 'Fruta', then filter with 'Carne' and all the data recieve are 'Carne'", async () => {
+    const testToken =  await generateToken();
+    const foodToSend = {
+      name: "Lomo",
+      calories: 2,
+      weight: 10,
+      category: "Carne",
+      carbs: 0,
+      proteins: 0,
+      fats: 0,
+    };
+    const response = await request(app)
+      .post("/api/foods")
+      .send(foodToSend)
+      .set("Authorization", "Bearer " + testToken);
+    expect(response.statusCode).toEqual(200);
+    const foodToSend2 = {
+      name: "Manzana",
+      calories: 2,
+      weight: 10,
+      category: "Fruta",
+      carbs: 0,
+      proteins: 0,
+      fats: 0,
+    };
+    const response2 = await request(app)
+      .post("/api/foods")
+      .send(foodToSend2)
+      .set("Authorization", "Bearer " + testToken);
+    expect(response2.statusCode).toEqual(200);
+    const response3 = await request(app)
+      .get("/api/foods/category/Carne")
+      .set("Authorization", "Bearer " + testToken);
+    const data = response3.body.data;
+     // Chequea que todo lo que hay dentro de la respuesta del filtra tenga la cateogria Carne
+    data.forEach(item => {
+        expect(item.category).toEqual('Carne');
+    });
+  });
+
 
 /*
 

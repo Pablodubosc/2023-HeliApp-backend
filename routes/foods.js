@@ -13,10 +13,10 @@ const { verifyToken } = require("../utils/handleJWT");
 //const checkRol = require('../middleware/role');
 
 router.get("/",verifyToken, getFoods);
-// el de abajo editarlo
+// el de abajo editarlo, , tengo que sacar el comun
 router.get("/:id",verifyToken, getFoodsWithOutAllergies);
 router.get("/category/:categoryName",verifyToken, getFoodsByCategory);
-// el de abajo editarlo
+// el de abajo editarlo, tengo que sacar el comun
 router.get("/category/:categoryName/:id",verifyToken, getFoodsByCategoryWithOutAllergies);
 router.post("/", validatorCreateFood,verifyToken, createFood);
 
