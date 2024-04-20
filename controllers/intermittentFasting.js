@@ -5,6 +5,7 @@ const { sendIntermittentFastingNotificationEmail } = require("./notifications");
 
 const createIntermittentFasting = async (req, res) => {
   try {
+    const userId = req.userId;
     const overlappingFasting = await intermittentFastingModel.findOne({
       $or: [
         {
@@ -12,7 +13,7 @@ const createIntermittentFasting = async (req, res) => {
           endDateTime: { $gt: req.body.startDateTime },
         },
       ],
-      userId: req.body.userId,
+      userId: userId,
     });
 
     if (overlappingFasting) {
@@ -50,7 +51,7 @@ const createIntermittentFasting = async (req, res) => {
 const getIntermittentFastingByUserId = async (req, res) => {
   try {
     const data = await intermittentFastingModel.find({
-      userId: req.params.userId,
+      userId: req.userId,
     });
     res.send({ data });
   } catch (e) {
@@ -63,7 +64,7 @@ const getActiveIntermittentFastingByUserId = async (req, res) => {
     const currentDate = new Date();
 
     const data = await intermittentFastingModel.find({
-      userId: req.params.userId,
+      userId: req.userId,
     });
     const filteredData = data.filter(
       (item) =>

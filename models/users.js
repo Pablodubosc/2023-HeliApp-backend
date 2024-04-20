@@ -37,10 +37,10 @@ const userSchema = new mongoose.Schema(
             type: Number,
             required: true,
         },
-        allergies: {
-            type: [],
-            default: [{ name: ""}],
-          },
+        allergies: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "foods"
+        }],
         secretToken:{
             type: String
         }

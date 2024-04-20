@@ -47,7 +47,7 @@ const loginController = async (req, res) => {
 const getUser = async (req, res) => {
     try{
         const userId = req.userId
-        const data = await usersModel.findById(userId);
+        const data = await usersModel.findById(userId).populate({path:'allergies' }).exec();
         if(!data){
             handleHttpError(res, 'USER_NOT_EXISTS', 404);
             return;
