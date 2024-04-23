@@ -1,4 +1,5 @@
 const { mealModel, usersModel, foodModel } = require("../models");
+const meal = require("../models/meal");
 const { handleHttpError } = require("../utils/handleErrors");
 
 
@@ -36,6 +37,16 @@ function calculateNutritionalInformation(meal) {
   return meal;
 }
 
+async function addWarningIfAllergy(meal,userId) {
+  const userJson = await usersModel.findOne({ _id: userId });
+  const allergicFoods = userJson.allergies;
+  // verifica si la comidas que no contienen alimentos alérgicos
+  const allergyFood = meal.foods.find(food => allergicFoods.includes(food.foodId._id));
+  const allergy = allergyFood ? allergyFood.foodId.name : false;
+  meal.allergy = allergy;
+  return meal;
+}
+
 const getMealsByUserId = async (req, res) => {
   try {
     const userId = req.userId;
@@ -49,9 +60,14 @@ const getMealsByUserId = async (req, res) => {
 
     // Convertir el resultado en un objeto JavaScript utilizando toJSON()
     const meals = data.map((meal) => meal.toJSON());
-    const mealsToSend = meals.map((meal) =>
-      calculateNutritionalInformation(meal)
-    );
+    /*const mealsToSend = meals.map((meal) =>
+      calculateNutritionalInformation(meal),
+      addWarningIfAllergy(meal, userId)
+    );*/
+    const mealsToSend = await Promise.all(meals.map(async (meal) => {
+      await addWarningIfAllergy(meal, userId);
+      return calculateNutritionalInformation(meal);
+    }));
 
     res.send({ data: mealsToSend });
   } catch (e) {
@@ -95,15 +111,26 @@ const createMeal = async (req, res) => {
   try {
     // Accede al userId desde req.body
     const userId = req.userId;
+
+    const userJson = await usersModel.findOne({ _id: userId });
+    const allergicFoods = userJson.allergies;
+    // verifica si la comidas que no contienen alimentos alérgicos
+    const hasAllergy = req.body.foods.some(food => {
+      return allergicFoods.includes(food.foodId);
+    });
+     
+    if (hasAllergy){
+      return handleHttpError(res, "Meal cant be created due to allergies", 403);
+    }
     // Agrega el userId a los datos de la comida antes de crearla
     const mealData = { ...req.body, userId };
+
     const data = await mealModel.create(mealData);
     // Eliminar el userId de la respuesta
     const { userId: removedUserId, ...responseData } = data.toObject();
     //res.status(200).end();
     res.send({ data: responseData });
   } catch (e) {
-    console.log(e);
     handleHttpError(res, "ERROR_CREATE_MEALS", 500);
   }
 };

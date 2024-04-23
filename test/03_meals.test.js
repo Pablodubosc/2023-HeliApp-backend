@@ -16,9 +16,7 @@ beforeAll(async () => {
   await usersModel.deleteMany({});
   await categoryModel.deleteMany({});
 });
-//FALTA QUE DE UN WARNING SI TENGO UNA MEAL CARGADA DESDE ANTES 
-// QUE HABER CARGADO LA ALERGIA
-// falta que no pueda crear por api una meal q soy alergico
+
 
 async function login(email) {
   const response = await request(app).post("/api/auth/register").send({
@@ -124,9 +122,60 @@ test("POST request for a user should return a 200 and should be retrieved with a
   expect(response1.statusCode).toEqual(200);
   expect(response1._body.data[0].name).toEqual("Asado");
   expect(response1._body.data[0].totalCalories).toEqual(60);
-  expect(response1._body.data[0].totalFats).toEqual(200);
-  expect(response1._body.data[0].totalCarbs).toEqual(200);
-  expect(response1._body.data[0].totalProteins).toEqual(200);
+  expect(response1._body.data[0].totalFats).toEqual(20);
+  expect(response1._body.data[0].totalCarbs).toEqual(60);
+  expect(response1._body.data[0].totalProteins).toEqual(40);
+  expect(response1._body.data[0].allergy).toEqual(false);
+});
+
+test("Cant create a meal if user is allergy to a food component", async () => {
+  const testToken = await login("alergico@admin.com");
+  const foods = await createFoods(testToken);
+  //seteo alergia en una food de la unica comida que hay
+  const response = await request(app).put("/api/auth/users").send({
+    allergies: [foods[0].foodId],
+  }).set("Authorization", "Bearer " + testToken);
+  expect(response.statusCode).toEqual(200);
+  const response1 = await request(app)
+    .post("/api/meals")
+    .send({
+      name: "Asado",
+      foods: foods,
+      date: new Date(),
+      hour: "20:15",
+    })
+    .set("Authorization", "Bearer " + testToken);
+  expect(response1.statusCode).toEqual(403);
+  expect(response1._body.message).toEqual("Meal cant be created due to allergies");
+});
+
+test("User create a meals, then add an allergy, so GET has a WARNING", async () => {
+  const testToken = await login("alergiaFoodsDeMeal@admin.com");
+  const foods = await createFoods(testToken);
+  const response = await request(app)
+    .post("/api/meals")
+    .send({
+      name: "Asado",
+      foods: foods,
+      date: new Date(),
+      hour: "20:15",
+    })
+    .set("Authorization", "Bearer " + testToken);
+  expect(response.statusCode).toEqual(200);
+  const response1 = await request(app).put("/api/auth/users").send({
+    allergies: [foods[0].foodId],
+  }).set("Authorization", "Bearer " + testToken);
+  expect(response1.statusCode).toEqual(200);
+  const response2 = await request(app)
+    .get("/api/meals/user")
+    .set("Authorization", "Bearer " + testToken);
+  expect(response2.statusCode).toEqual(200);
+  expect(response2._body.data[0].name).toEqual("Asado");
+  expect(response2._body.data[0].totalCalories).toEqual(60);
+  expect(response2._body.data[0].totalFats).toEqual(20);
+  expect(response2._body.data[0].totalCarbs).toEqual(60);
+  expect(response2._body.data[0].totalProteins).toEqual(40);
+  expect(response2._body.data[0].allergy).toEqual("Lomo");
 });
 
 test("A meal cannot be created without name", async () => { //  y esto?
