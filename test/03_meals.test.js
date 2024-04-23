@@ -18,6 +18,7 @@ beforeAll(async () => {
 });
 //FALTA QUE DE UN WARNING SI TENGO UNA MEAL CARGADA DESDE ANTES 
 // QUE HABER CARGADO LA ALERGIA
+// falta que no pueda crear por api una meal q soy alergico
 
 async function login(email) {
   const response = await request(app).post("/api/auth/register").send({
@@ -202,7 +203,7 @@ test("Updating a the name and weigth of a meal and a food should return a 200 st
   expect(mealAfterUpdate.name).toEqual("Carne con papas");
 });
 
-test("Retrieving meals for a user on a specific date should return a 200 status code", async () => {
+test("Retrieving meals for a user on a specific date should return a 200 status code and foods information", async () => {
   const testToken = await login("adminuser5@admin.com");
   const foods = await createFoods(testToken);
   const fechaActual = new Date();

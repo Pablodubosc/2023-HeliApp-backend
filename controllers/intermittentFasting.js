@@ -1,4 +1,4 @@
-const { intermittentFastingModel } = require("../models");
+const { intermittentFastingModel, usersModel } = require("../models");
 const { handleHttpError } = require("../utils/handleErrors");
 const schedule = require("node-schedule");
 const { sendIntermittentFastingNotificationEmail } = require("./notifications");
@@ -6,6 +6,9 @@ const { sendIntermittentFastingNotificationEmail } = require("./notifications");
 const createIntermittentFasting = async (req, res) => {
   try {
     const userId = req.userId;
+    const userData = await usersModel.findById(userId);
+    const email = userData.email;
+    const userName = userData.firstName;
     const overlappingFasting = await intermittentFastingModel.findOne({
       $or: [
         {
@@ -19,16 +22,16 @@ const createIntermittentFasting = async (req, res) => {
     if (overlappingFasting) {
       return handleHttpError(res, "CONFLICTING_FASTING_PERIOD", 501);
     }
-
-    const data = await intermittentFastingModel.create(req.body);
+    const itFastingData = { ...req.body, userId };
+    const data = await intermittentFastingModel.create(itFastingData);
     const endDateTime = new Date(req.body.endDateTime);
     schedule.scheduleJob(
       endDateTime.setTime(endDateTime.getTime() - 60 * 60000),
       () => {
         const reqUpdateUser = {
           body: {
-            email: req.body.email,
-            userName: req.body.userName,
+            email: email,
+            userName: userName,
           },
         };
 
@@ -38,7 +41,6 @@ const createIntermittentFasting = async (req, res) => {
             console.log(`Status Code: ${statusCode}`);
           },
         };
-
         sendIntermittentFastingNotificationEmail(reqUpdateUser, resUpdateUser);
       }
     );

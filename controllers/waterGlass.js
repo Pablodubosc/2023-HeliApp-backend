@@ -7,10 +7,7 @@ const createWaterGlass = async (req, res) => {
     const data = await waterGlassModel.create({ ...req.body, userId: userId });
 
     // Convertir el documento Mongoose a un objeto de JavaScript estándar
-    const dataObject = data.toObject();
-
-    // Eliminar la propiedad 'userId' del objeto
-    delete dataObject.userId;
+    const { userId: removedUserId, ...dataObject } = data.toObject();
 
     res.send({ data: dataObject });
   } catch (e) {
@@ -35,21 +32,18 @@ const getWaterGlassByUserId = async (req, res) => {
 const getWaterGlassForUserIdByDay = async (req, res) => {
   try {
     const userId = req.userId;
-    const result = await waterGlassModel.aggregate([
-      {
-        $match: { userId },
-      },
-      {
-        $group: {
-          _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
-          count: { $sum: 1 },
-        },
-      },
-      {
-        $sort: { _id: 1 },
-      },
-    ]);
-    res.send({ result });
+    const results = await waterGlassModel.find({ userId });
+    const groupedResults = {};
+    // Iteramos sobre los resultados y contamos las ocurrencias de cada fecha
+    results.forEach((result) => {
+      const date = result.date.toISOString().split("T")[0]; // Obtenemos la fecha en formato "YYYY-MM-DD"
+
+      if (!groupedResults[date]) {
+        groupedResults[date] = 0;
+      }
+      groupedResults[date]++;
+    });
+    res.send({ groupedResults });
   } catch (e) {
     handleHttpError(
       res,

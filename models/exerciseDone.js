@@ -5,10 +5,23 @@ const exerciseDoneSchema = new mongoose.Schema(
   {
     name: {
       type: String,
+      required: true,
     },
     exercises: {
       type: [
-        { type: mongoose.Schema.Types.Mixed, ref: "exercise", required: true },
+        {
+          exerciseId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "exercise",
+            required: true,
+          },
+          timeWasted: {
+            type: Number,
+            min: [0],
+            default: 0,
+            required: true,
+          },
+        },
       ],
       required: true,
       validate: {
@@ -20,16 +33,17 @@ const exerciseDoneSchema = new mongoose.Schema(
     },
     date: {
       type: Date,
+      required: true,
     },
     hour: {
       type: String,
-    },
-    caloriesBurn: {
-      type: Number,
-      min: [0]
+      match: /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/,
+      required: true,
     },
     userId: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "users",
+      required: true,
     },
   },
   {

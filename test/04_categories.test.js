@@ -51,7 +51,6 @@ test("Category is succesfully created, stored in the DB and returns a 200", asyn
   expect(category.name).toEqual("Verduras");
 });
 
-
 test("GET requests is succesfully made after a POST, getting the correct category and receving a 200", async () => {
   const testToken = generateTestToken();
   const response = await request(app)

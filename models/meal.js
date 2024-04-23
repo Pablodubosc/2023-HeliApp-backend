@@ -53,4 +53,4 @@ const mealSchema = new mongoose.Schema(
 );
 
 mealSchema.plugin(mongooseDelete, { overrideMethods: "all" });
-module.exports = mongoose.model("meals2", mealSchema);
+module.exports = mongoose.model("meals", mealSchema);

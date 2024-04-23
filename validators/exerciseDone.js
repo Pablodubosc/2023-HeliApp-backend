@@ -1,8 +1,11 @@
 const { check } = require("express-validator");
 const validateResults = require("../utils/handleValidator")
 
-const validatorCreatePlan = [
+const validatorCreateExerciseDone = [
     check("name")
+    .exists()
+    .notEmpty(),
+    check('exercises')
     .exists()
     .notEmpty(),
     (req, res, next) => {
@@ -11,4 +14,4 @@ const validatorCreatePlan = [
 ];
 
     
-module.exports = {validatorCreatePlan};
+module.exports = {validatorCreateExerciseDone};

@@ -6,19 +6,26 @@ const {
   updateGoal,
   deleteGoal,
   getActiveGoalsByUserId,
-  getGoalsByUserWithProgress
+  getGoalsByUserWithProgress,
 } = require("../controllers/goals");
 const { verifyToken } = require("../utils/handleJWT");
-const extractUserIdMiddleware = require("../utils/handleUserId");
+const extractUserIdMiddleware = require("../utils/handleUserID");
 
-
-router.get("/:userId",verifyToken, extractUserIdMiddleware, getGoalsByUserId);
-router.get("/activeGoals/", verifyToken,
-extractUserIdMiddleware, getActiveGoalsByUserId);
-router.get("/goalsWithProgress/", verifyToken,
-extractUserIdMiddleware,getGoalsByUserWithProgress)
-router.post("/",extractUserIdMiddleware, createGoal);
-router.put("/:goalId",extractUserIdMiddleware, updateGoal);
-router.delete("/:goalId",extractUserIdMiddleware, deleteGoal);
+router.get("/", verifyToken, extractUserIdMiddleware, getGoalsByUserId);
+router.get(
+  "/activeGoals/",
+  verifyToken,
+  extractUserIdMiddleware,
+  getActiveGoalsByUserId
+);
+router.get(
+  "/goalsWithProgress/",
+  verifyToken,
+  extractUserIdMiddleware,
+  getGoalsByUserWithProgress
+);
+router.post("/", verifyToken, extractUserIdMiddleware, createGoal);
+router.put("/:goalId", verifyToken, extractUserIdMiddleware, updateGoal);
+router.delete("/:goalId", verifyToken, extractUserIdMiddleware, deleteGoal);
 
 module.exports = router;

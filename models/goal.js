@@ -1,43 +1,65 @@
-const mongoose = require('mongoose');
-const mongooseDelete = require('mongoose-delete');
+const mongoose = require("mongoose");
+const mongooseDelete = require("mongoose-delete");
 
 const goalSchema = new mongoose.Schema(
-    {
-        name:{
-            type: String,
-            requiere: true            
-        },
-        type:{
-            type: String,
-            requiere: true
-        },
-        objetive:{
-            type: Number,
-            min: [0],
-            requiere: true
-        },
-        userId:{
-            type: String,
-            requiere: true
-        },
-        startDate:{
-            type: Date,
-            requiere: true
-        },
-        endDate:{
-            type: Date,
-            requiere: true
-        },
-        recurrency:{
-            type: String,
-            requiere: true
-        }
+  {
+    name: {
+      type: String,
+      required: true,
     },
-    {
-        timestamps: true,
-        versionKey: false
-    }
-);    
+    type:{
+        type: String,
+        enum: ["Calories", "Fats", "Proteins", "Carbs", "Calories Burn"],
+        validate: {
+          validator: function (option) {
+            return ["Calories", "Fats", "Proteins", "Carbs", "Calories Burn"].includes(option);
+          },
+          message: "Invalid type of goal",
+        },
+        required: true,
+    },
+    objetive: {
+      type: Number,
+      min: [0],
+      required: true,
+    },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "users",
+      required: true,
+    },
+    startDate: {
+      type: Date,
+      required: true,
+    },
+    endDate: {
+      type: Date,
+      required: true,
+      validate: {
+        validator: function (value) {
+          return this.startDate <= value;
+        },
+        message: (props) =>
+          `La fecha de fin debe ser mayor o igual a la fecha de inicio.`,
+      },
+    },
+    recurrency: {
+      type: String,
+      enum: ["Monthly", "Weekly", "Non-Recurring"],
+      validate: {
+        validator: function (option) {
+          return ["Monthly", "Weekly", "Non-Recurring"].includes(option);
+        },
+        message: "Invalid option for recurrency",
+      },
+      required: true,
+    },
+  },
+  {
+    timestamps: true,
+    versionKey: false,
+  }
+);
 
-goalSchema.plugin(mongooseDelete, { overrideMethods: 'all' });
-module.exports = mongoose.model('goal', goalSchema);
+goalSchema.plugin(mongooseDelete, { overrideMethods: "all" });
+module.exports = mongoose.model("goal", goalSchema);

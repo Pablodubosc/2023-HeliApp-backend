@@ -169,7 +169,7 @@ test("User create a food succesfully", async () => {
   expect(response.statusCode).toEqual(200);
   const foodId = response._body.data._id;
   const food = await foodModel.findById(foodId);
-  expect(food).toBeTruthy(); // que es tobetruthy?
+  expect(food).toBeTruthy(); 
   expect(food.name).toEqual("Rucula");
 });
 test("User create a foods and gets it successfully", async () => {

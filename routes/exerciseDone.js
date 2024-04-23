@@ -1,7 +1,9 @@
 const express = require("express");
 const router = express.Router();
+const { verifyToken } = require("../utils/handleJWT");
+const extractUserIdMiddleware = require("../utils/handleUserID");
+const { validatorCreateExerciseDone } = require("../validators/exerciseDone");
 const {
-  getExerciseDone,
   createExerciseDone,
   getExerciseDoneByUserId,
   updateExerciseDoneById,
@@ -11,14 +13,13 @@ const {
   getCaloriesBurnBetweenDays
 } = require("../controllers/exerciseDone");
 
-router.get("/", getExerciseDone);
-router.get("/user/:id", getExerciseDoneByUserId);
-router.get("/user/:id/date/:date", getExerciseDoneByUserIdAndDate);
-router.post("/", createExerciseDone);
-router.put("/:id", updateExerciseDoneById);
-router.delete("/:id", deleteExerciseDoneById);
-router.get("/user/:id/startDate/:startDate/endDate/:endDate",getCaloriesBurnByDays)
-router.get("/user/:id/between/:startDate/:endDate",getCaloriesBurnBetweenDays)
+router.get("/user/", verifyToken, extractUserIdMiddleware, getExerciseDoneByUserId);
+router.get("/user/date/:date", verifyToken, extractUserIdMiddleware, getExerciseDoneByUserIdAndDate);
+router.post("/", verifyToken,validatorCreateExerciseDone, extractUserIdMiddleware, createExerciseDone);
+router.put("/:id", verifyToken, extractUserIdMiddleware, updateExerciseDoneById);
+router.delete("/:id", verifyToken, extractUserIdMiddleware, deleteExerciseDoneById);
+router.get("/user/startDate/:startDate/endDate/:endDate", verifyToken, extractUserIdMiddleware,getCaloriesBurnByDays)
+router.get("/user/between/:startDate/:endDate", verifyToken, extractUserIdMiddleware,getCaloriesBurnBetweenDays)
 
 
 module.exports = router;

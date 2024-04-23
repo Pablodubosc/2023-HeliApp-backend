@@ -1,15 +1,6 @@
 const { mealModel, usersModel, foodModel } = require("../models");
 const { handleHttpError } = require("../utils/handleErrors");
 
-/*const getMeals = async (req, res) => {
-  try {
-    const user = req.user;
-    const data = await mealModel.find({});
-    res.send({ data, user });
-  } catch (e) {
-    handleHttpError(res, "ERROR_GET_MEALS", 500);
-  }
-};*/
 
 function calculateNutritionalInformation(meal) {
   let totalCalories = 0;
