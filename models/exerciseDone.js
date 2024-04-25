@@ -35,11 +35,6 @@ const exerciseDoneSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
-    hour: {
-      type: String,
-      match: /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/,
-      required: true,
-    },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "users",

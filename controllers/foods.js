@@ -6,8 +6,18 @@ const getFoods = async (req, res) => {
     const user = req.user;
     const allFoods = await foodModel.find({}).populate({ path: "category" }).exec();
     const userModel = await usersModel.findById(user)
-    const data = allFoods.filter(alimento => !(userModel.allergies).some(alergia => alergia._id.toString() === alimento._id.toString()));
+    const data = allFoods.filter(alimento => !(userModel.allergies).some(alergia => alergia.allergyId.toString() === alimento._id.toString()));
     res.send({ data });
+  } catch (e) {
+    handleHttpError(res, "ERROR_GET_FOODS", 500);
+  }
+};
+
+const getAllFoods = async (req, res) => {
+  try {
+    const user = req.user;
+    const allFoods = await foodModel.find({}).populate({ path: "category" }).exec();
+    res.send({ allFoods });
   } catch (e) {
     handleHttpError(res, "ERROR_GET_FOODS", 500);
   }
@@ -46,4 +56,4 @@ const createFood = async (req, res) => {
   }
 };
 
-module.exports = { getFoods, createFood, getFoodsByCategory };
+module.exports = { getFoods,getAllFoods, createFood, getFoodsByCategory };

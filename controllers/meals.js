@@ -38,13 +38,20 @@ function calculateNutritionalInformation(meal) {
 }
 
 async function addWarningIfAllergy(meal,userId) {
-  const userJson = await usersModel.findOne({ _id: userId });
-  const allergicFoods = userJson.allergies;
-  // verifica si la comidas que no contienen alimentos alérgicos
-  const allergyFood = meal.foods.find(food => allergicFoods.includes(food.foodId._id));
-  const allergy = allergyFood ? allergyFood.foodId.name : false;
-  meal.allergy = allergy;
-  return meal;
+  const userModel = await usersModel.findById(userId)
+  const alergias = userModel.allergies
+  const foods = meal.foods
+
+  for (let allergy of alergias) {
+    for (let food of foods) {
+      if (allergy.allergyId.toString() === food.foodId._id.toString()) {
+        meal.allergy = true;
+        return meal // Si hay una coincidencia, retorna true
+      }
+    }
+  }
+  meal.allergy = false; 
+  return meal
 }
 
 const getMealsByUserId = async (req, res) => {
@@ -58,12 +65,7 @@ const getMealsByUserId = async (req, res) => {
       })
       .exec();
 
-    // Convertir el resultado en un objeto JavaScript utilizando toJSON()
     const meals = data.map((meal) => meal.toJSON());
-    /*const mealsToSend = meals.map((meal) =>
-      calculateNutritionalInformation(meal),
-      addWarningIfAllergy(meal, userId)
-    );*/
     const mealsToSend = await Promise.all(meals.map(async (meal) => {
       await addWarningIfAllergy(meal, userId);
       return calculateNutritionalInformation(meal);

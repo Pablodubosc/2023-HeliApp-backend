@@ -38,8 +38,9 @@ const userSchema = new mongoose.Schema(
             required: true,
         },
         allergies: [{
+            allergyId:{
             type: mongoose.Schema.Types.ObjectId,
-            ref: "foods"
+            ref: "foods"}
         }],
         secretToken:{
             type: String
