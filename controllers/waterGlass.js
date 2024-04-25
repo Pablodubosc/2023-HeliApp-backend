@@ -34,6 +34,7 @@ const getWaterGlassForUserIdByDay = async (req, res) => {
     const userId = req.userId;
     const results = await waterGlassModel.find({ userId });
     const groupedResults = {};
+
     // Iteramos sobre los resultados y contamos las ocurrencias de cada fecha
     results.forEach((result) => {
       const date = result.date.toISOString().split("T")[0]; // Obtenemos la fecha en formato "YYYY-MM-DD"
@@ -43,7 +44,14 @@ const getWaterGlassForUserIdByDay = async (req, res) => {
       }
       groupedResults[date]++;
     });
-    res.send({ groupedResults });
+
+    // Convertimos el objeto agrupado en una lista de objetos
+    const resultList = Object.keys(groupedResults).map((date) => ({
+      date,
+      count: groupedResults[date]
+    }));
+
+    res.send({ data: resultList });
   } catch (e) {
     handleHttpError(
       res,

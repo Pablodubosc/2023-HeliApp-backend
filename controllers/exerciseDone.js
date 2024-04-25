@@ -224,12 +224,12 @@ const getCaloriesBurnByDays = async (req, res) => {
     const exercisesDoneToSend = exercisesDone.map((exerciseDone) =>
       calculateExerciseInformation(exerciseDone)
     );
-    let totalCaloriesBurn = 0;
+    let totalConsumido = 0;
     exercisesDoneToSend.forEach((record) => {
-      totalCaloriesBurn += record.totalCaloriesBurn;
+      totalConsumido += record.totalCaloriesBurn;
     });
 
-    res.send({ totalCaloriesBurn });
+    res.send({ totalConsumido });
   } catch (e) {
     handleHttpError(res, "ERROR_GET_CALORIES", 500);
   }

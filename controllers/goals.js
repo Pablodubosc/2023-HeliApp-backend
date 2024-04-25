@@ -194,6 +194,7 @@ const getGoalsByUserWithProgress = async(req,res) => {
 const createGoal = async (req, res) => {
   try {
     const userId = req.userId;
+    console.log(userId)
     if (!userId) {
       return handleHttpError(res, "User ID not provided", 400);
     }
@@ -201,6 +202,7 @@ const createGoal = async (req, res) => {
     const { userId: removedUserId, ...responseData } = data.toObject();
     res.send({ data: responseData });
   } catch (e) {
+    console.log(e)
     handleHttpError(res, "ERROR_CREATE_GOAL", 500);
   }
 };
@@ -224,6 +226,7 @@ const updateGoal = async (req, res) => {
         500
       );
     }
+    console.log("LLEGA HASTA ACA")
     // Si el objetivo pertenece al usuario, procedemos a actualizarlo
     const updatedGoal = await goalModel.findOneAndUpdate(
       { _id: goalId },

@@ -2,6 +2,7 @@ const { mealModel, usersModel, planModel, exerciseDoneModel } = require("../mode
 const { handleHttpError } = require("../utils/handleErrors");
 
 function calculateNutritionalInformation(meal) {
+  console.log(meal)
   let totalCalories = 0;
   let totalFats = 0;
   let totalCarbs = 0;
@@ -100,6 +101,7 @@ const createPlan = async (req, res) => {
     const data = await planModel.create(req.body);
     res.send({ data });
   } catch (e) {
+    console.log(e)
     handleHttpError(res, "ERROR_CREATE_PLAN", 500);
   }
 };
@@ -134,6 +136,7 @@ const selectExerciseToMeetObjetive = (allExercises, target, targetType) => {
 
 const selectMealsToMeetObjetive = (filteredMeals, target, targetType) => {
 
+    console.log("FILTERED")
   // Copia la lista de comidas para no modificar la original
   const mealsCopy = [...filteredMeals];
 
@@ -170,16 +173,15 @@ const getPlansByUserId = async (req, res) => {
       .populate({
         path: "suggestions.mealSuggestionId",
         model: "meals",
-        match: { mealSuggestionId: { $exists: true } }
       })
       .populate({
         path: "suggestions.exerciseDoneSuggestionId",
         model: "exerciseDone",
-        match: { exerciseDoneSuggestionId: { $exists: true } }
       })
       .exec();
     res.send({ data });
     } catch (e) {
+      console.log(e)
       handleHttpError(res, "ERROR_GET_PLANS", 500);
     }
   };
