@@ -8,7 +8,19 @@ const planSchema = new mongoose.Schema(
       required: true
     },
     suggestions: {
-      type: [],
+      type: [
+        {
+          suggestion: {
+            type: [],
+            required: true,
+          },
+          done: {
+            type: Boolean,
+            default: false,
+            required: true,
+          },
+        },
+      ],
       required: true,
       validate: {
         validator: function (array) {
@@ -61,4 +73,4 @@ const planSchema = new mongoose.Schema(
 );
 
 planSchema.plugin(mongooseDelete, { overrideMethods: "all" });
-module.exports = mongoose.model("plans", planSchema);
+module.exports = mongoose.model("plans2", planSchema);

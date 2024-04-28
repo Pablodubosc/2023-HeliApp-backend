@@ -2,7 +2,6 @@ const { mealModel, usersModel, planModel, exerciseDoneModel } = require("../mode
 const { handleHttpError } = require("../utils/handleErrors");
 
 function calculateNutritionalInformation(meal) {
-  console.log(meal)
   let totalCalories = 0;
   let totalFats = 0;
   let totalCarbs = 0;
@@ -27,7 +26,7 @@ function calculateNutritionalInformation(meal) {
     totalCalories += caloriesPerFood;
     totalFats += fatsPerFood;
     totalCarbs += carbsPerFood;
-    totalProteins = +proteinsPerFood;
+    totalProteins += proteinsPerFood;
   });
   meal.totalCalories = totalCalories;
   meal.totalFats = totalFats;
@@ -49,6 +48,22 @@ function calculateExerciseInformation(exerciseDone) {
   return exerciseDone;
 }
 
+async function addWarningIfAllergy(meal,userId) {
+  const userModel = await usersModel.findOne({ _id: userId }).populate({path: "allergies.allergyId",model: "foods"}).exec();
+  const alergias = userModel.allergies
+  const foods = meal.suggestion.foods
+  for (let allergy of alergias) {
+    for (let food of foods) {
+      if (allergy.allergyId.name.toString() === food.foodId.name.toString()) {
+        meal.allergy = true;
+        return meal // Si hay una coincidencia, retorna true
+      }
+    }
+  }
+  meal.allergy = false; 
+  return meal
+}
+
 const createPlan = async (req, res) => {
   try {
     const userId = req.userId;
@@ -60,16 +75,23 @@ const createPlan = async (req, res) => {
       const allMealsWithInfo = allMealsJson.map((meal) =>
         calculateNutritionalInformation(meal)
       );
-      const userJson = await usersModel.findOne({ _id: userId });
-        const allergicFoods = userJson.allergies;
+      const userJson = await usersModel.findOne({ _id: userId }).populate({path:'allergies.allergyId',model: "foods"}).exec();
+      const allergicFoods = userJson.allergies;
         // Filtra las comidas que no contienen alimentos alérgicos
-        const filteredMeals = allMealsWithInfo.filter(meal => {
+      const filteredMeals = allMealsWithInfo.filter(meal => {
+          // Iterar sobre cada comida
           for (const food of meal.foods) {
-            if (allergicFoods.includes(food.foodId._id)) {
-              return false; // La comida contiene un alimento alérgico, no la incluyas
+            // Iterar sobre cada alimento alérgico
+            for (const allergicFood of allergicFoods) {
+              // Verificar si el foodId del alimento coincide con el allergyId
+              if (JSON.stringify(food.foodId.name) === JSON.stringify(allergicFood.allergyId.name)){
+                // Si hay coincidencia, retornar false y excluir la comida
+                return false;
+              }
             }
           }
-          return true; // La comida no contiene alimentos alérgicos, inclúyela
+          // Si no se encuentra ninguna coincidencia, retornar true y mantener la comida
+          return true;
         });
 
         const selectedMeals = selectMealsToMeetObjetive(filteredMeals, planObjetive, "total"+planType);
@@ -101,7 +123,6 @@ const createPlan = async (req, res) => {
     const data = await planModel.create(req.body);
     res.send({ data });
   } catch (e) {
-    console.log(e)
     handleHttpError(res, "ERROR_CREATE_PLAN", 500);
   }
 };
@@ -125,8 +146,7 @@ const selectExerciseToMeetObjetive = (allExercises, target, targetType) => {
     const randomExercise = getRandomExercise();
     if(currentObjetive + randomExercise.totalCaloriesBurn <= target)
     {
-      exerciseDoneId = randomExercise._id;
-      const randomExerciseWithDone = { exerciseDoneSuggestionId: exerciseDoneId, done: false };
+      const randomExerciseWithDone = { suggestion: randomExercise, done: false };
       selectedExercises.push(randomExerciseWithDone);
       currentObjetive += randomExercise.totalCaloriesBurn;
     }
@@ -136,7 +156,6 @@ const selectExerciseToMeetObjetive = (allExercises, target, targetType) => {
 
 const selectMealsToMeetObjetive = (filteredMeals, target, targetType) => {
 
-    console.log("FILTERED")
   // Copia la lista de comidas para no modificar la original
   const mealsCopy = [...filteredMeals];
 
@@ -155,8 +174,7 @@ const selectMealsToMeetObjetive = (filteredMeals, target, targetType) => {
     const randomMeal = getRandomMeal();
     if(currentObjetive + randomMeal[targetType] <= target && randomMeal[targetType]>0)
     {
-      mealId= randomMeal._id;
-      const randomMealWithDone = { mealSuggestionId: mealId, done: false };
+      const randomMealWithDone = { suggestion: randomMeal, done: false };
       selectedMeals.push(randomMealWithDone);
       currentObjetive += randomMeal[targetType];
     }
@@ -170,23 +188,23 @@ const getPlansByUserId = async (req, res) => {
     try {
       const userId = req.userId;
       const data = await planModel.find({ userId: userId }).select("-userId")
-      .populate({
-        path: "suggestions.mealSuggestionId",
-        model: "meals",
-      })
-      .populate({
-        path: "suggestions.exerciseDoneSuggestionId",
-        model: "exerciseDone",
-      })
-      .exec();
-    res.send({ data });
+      const allPlans = data.map((plan) => plan.toJSON());
+      const plansToSend = await Promise.all(allPlans.map(async (plan) => {
+          if (plan.planType != "Calories Burn") {
+            for (let i = 0; i < plan.suggestions.length; i++) {
+              const suggestion = plan.suggestions[i];
+              const suggestionWithWarning = await addWarningIfAllergy(suggestion,userId)
+              plan.suggestions[i] = suggestionWithWarning;
+          }}
+        return plan
+      }));
+      res.send({ data:plansToSend });
     } catch (e) {
-      console.log(e)
       handleHttpError(res, "ERROR_GET_PLANS", 500);
     }
   };
 
-  const deletePlanById = async (req, res) => {
+const deletePlanById = async (req, res) => {
     try {
       // Obtener el userId de la solicitud
       const userId = req.userId;
@@ -210,8 +228,31 @@ const getPlansByUserId = async (req, res) => {
     }
   };
 
+const updatePlanById = async (req, res) => {
+    try {
+    const userId = req.userId;
+    const planId = req.params.id;
+
+    // Primero, verificamos si la comida pertenece al usuario actual
+    const plan = await planModel.findOne({ _id: planId, userId: userId });
+    if (!plan) {
+      return handleHttpError(res, "Plan not found or unauthorized", 404);
+    }
+    const updatedPlan = await planModel.findOneAndUpdate(
+      { _id: req.body._id },
+      req.body
+    );
+    // Eliminar el userId de la respuesta
+    const { userId: removedUserId, ...responseData } = updatedPlan.toObject();
+    res.send({ data: responseData });
+    } catch (e) {
+      handleHttpError(res, "ERROR_UPDATE_PLAN", 500);
+    }
+  };
+
 module.exports = {
   createPlan,
   getPlansByUserId,
-  deletePlanById
+  deletePlanById,
+  updatePlanById
 };

@@ -28,7 +28,7 @@ function calculateNutritionalInformation(meal) {
     totalCalories += caloriesPerFood;
     totalFats += fatsPerFood;
     totalCarbs += carbsPerFood;
-    totalProteins = +proteinsPerFood;
+    totalProteins += proteinsPerFood;
   });
   meal.totalCalories = totalCalories;
   meal.totalFats = totalFats;
