@@ -219,14 +219,13 @@ const updateGoal = async (req, res) => {
       return handleHttpError(res, "Goal not found or unauthorized", 404);
     }
     const status = await calculateGoalStatus(goal);
-    if (status != "Not started") {
+    if (status == "Expired") {
       return handleHttpError(
         res,
         "Can't edit a goal that has started or it's expired",
         500
       );
     }
-    console.log("LLEGA HASTA ACA")
     // Si el objetivo pertenece al usuario, procedemos a actualizarlo
     const updatedGoal = await goalModel.findOneAndUpdate(
       { _id: goalId },
