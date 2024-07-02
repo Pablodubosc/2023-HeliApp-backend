@@ -231,9 +231,8 @@ const deletePlanById = async (req, res) => {
 const updatePlanById = async (req, res) => {
     try {
     const userId = req.userId;
-    const planId = req.params.id;
-
-    // Primero, verificamos si la comida pertenece al usuario actual
+    const planId = req.body._id;
+    // Primero, verificamos si el plan pertenece al usuario actual
     const plan = await planModel.findOne({ _id: planId, userId: userId });
     if (!plan) {
       return handleHttpError(res, "Plan not found or unauthorized", 404);
