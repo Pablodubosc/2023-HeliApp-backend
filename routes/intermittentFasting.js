@@ -5,6 +5,7 @@ const {
   getIntermittentFastingByUserId,
   getActiveIntermittentFastingByUserId,
   deleteActiveIntermittentFasting,
+  getNextIntermittentFastingByUserId
 } = require("../controllers/intermittentFasting");
 const { verifyToken } = require("../utils/handleJWT");
 const extractUserIdMiddleware = require("../utils/handleUserID");
@@ -16,16 +17,16 @@ router.post(
   createIntermittentFasting
 );
 router.get(
-  "/:userId",
-  verifyToken,
-  extractUserIdMiddleware,
-  getIntermittentFastingByUserId
-);
-router.get(
-  "/active/:userId",
+  "/active",
   verifyToken,
   extractUserIdMiddleware,
   getActiveIntermittentFastingByUserId
+);
+router.get(
+  "/next",
+  verifyToken,
+  extractUserIdMiddleware,
+  getNextIntermittentFastingByUserId
 );
 router.delete(
   "/active/:IntermittentFastingId",
