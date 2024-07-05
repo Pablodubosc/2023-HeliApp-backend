@@ -66,9 +66,12 @@ const getActiveIntermittentFastingByUserId = async (req, res) => {
     const data = await intermittentFastingModel.find({
       userId: req.userId,
     });
+    const today = new Date();
+    today.setSeconds(0);
+    today.setHours(today.getHours() - 3);
     const filteredData = data.find(
       (item) =>
-        new Date() >= item.startDateTime && new Date() <= item.endDateTime
+        today >= item.startDateTime && today <= item.endDateTime
     );
     res.send({ filteredData });
   } catch (e) {
@@ -82,10 +85,13 @@ const getActiveIntermittentFastingByUserId = async (req, res) => {
 
 const getNextIntermittentFastingByUserId = async (req, res) => {
   try {
+    const today = new Date();
+    today.setSeconds(0);
+    today.setHours(today.getHours() - 3);
     const filteredData = await intermittentFastingModel
     .find({
       userId: req.userId,
-      startDateTime: { $gt: new Date() } // Filtrar por startDateTime mayor que la fecha actual
+      startDateTime: { $gt: today } // Filtrar por startDateTime mayor que la fecha actual
     })
     .sort({ startDateTime: 1 }) // Ordenar por startDateTime ascendente
     .limit(1); // Limitar el resultado a 1 documento
