@@ -22,7 +22,7 @@ const loginController = async (req, res) => {
   try {
     const user = await usersModel
       .findOne({ email: req.body.email })
-      .select("firstName lastName email password");
+      .select("firstName _id lastName email password");
     if (!user) {
       handleHttpError(res, "USER_NOT_EXISTS", 404);
       return;
@@ -76,7 +76,7 @@ const getUserByEmail = async (req, res) => {
 
 const updateUserPassword = async (req, res) => {
   try {
-    const userId = req.userId;
+    const userId = req.body._id;
     const newPassword = req.body.password;
     const password = await encrypt(newPassword);
 
@@ -92,12 +92,23 @@ const updateUserPassword = async (req, res) => {
 
 const updateUser = async (req, res) => {
   try {
-    const userId = req.userId;
-    const data = await usersModel.findOneAndUpdate({ _id: userId }, req.body);
-    res.status(200).send({ message: "USER_UPDATE_SUCCESFULL" });
+    const userId = req.params.id;
+    const updatedUser = await usersModel.findOneAndUpdate(
+      { email: req.params.email },
+      req.body,
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).send({ message: "USER_NOT_FOUND" });
+    }
+
+    res
+      .status(200)
+      .send({ message: "USER_UPDATE_SUCCESFULL", user: updatedUser });
   } catch (e) {
+    console.error(e); // Agregar registro del error
     handleHttpError(res, "ERROR_UPDATE_USER", 500);
-    return 500;
   }
 };
 
