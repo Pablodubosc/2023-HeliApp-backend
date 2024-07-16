@@ -221,11 +221,11 @@ test("CaloriesBurn between two dates should return each day and calories", async
   })
   .set("Authorization", "Bearer " + testToken);
   const startDate = encodeURI(
-    "Mon Apr 16 2024 00:00:00 GMT-0300 (hora estándar de Argentina)"
+    "Mon Jul 16 2024 00:00:00 GMT-0300 (hora estándar de Argentina)"
   );
 
   const endDate = encodeURI(
-    "Wed Apr 25 2024 00:00:52 GMT-0300 (hora estándar de Argentina)"
+    "Mon Jul 29 2024 00:00:52 GMT-0300 (hora estándar de Argentina)"
   );
 
   const response1 = await request(app)
@@ -262,7 +262,7 @@ test("CaloriesBurn between two dates should return total calories", async () => 
   .set("Authorization", "Bearer " + testToken)
   //Cambiar fecha
   const startDate = encodeURI(
-    "Mon Apr 08 2024 00:00:00 GMT-0300 (hora estándar de Argentina)"
+    "Mon Jul 16 2024 00:00:00 GMT-0300 (hora estándar de Argentina)"
   );
 
   const endDate = encodeURI(
@@ -273,7 +273,7 @@ test("CaloriesBurn between two dates should return total calories", async () => 
     .get("/api/exerciseDone/user/startDate/" + startDate + "/endDate/" + endDate)
     .set("Authorization", "Bearer " + testToken);
   expect(response3.statusCode).toEqual(200);
-  expect(response3._body.totalCaloriesBurn).toEqual(240);
+  expect(response3._body.totalConsumido).toEqual(240);
 },9000);
 
 

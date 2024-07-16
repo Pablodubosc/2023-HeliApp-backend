@@ -63,8 +63,8 @@ test("Se obtuvieron los water glass for user id by day correctamente. ", async (
     .get("/api/waterGlass/countByDay/")
     .set("Authorization", "Bearer " + testToken);
   //falta ordenar la response para el grafico
-  expect(response1._body.groupedResults["2024-04-10"]).toEqual(2);
-  expect(response1._body.groupedResults["2024-04-11"]).toEqual(1);
+  expect(response1._body.data[0].count).toEqual(2);
+  expect(response1._body.data[1].count).toEqual(1);
 });
 
 test("Successfully retrieved water consumption records by user ID", async () => {

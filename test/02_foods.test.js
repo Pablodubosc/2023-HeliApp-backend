@@ -1,7 +1,7 @@
 const request = require("supertest");
 const app = require("../app");
 const { foodModel, categoryModel, usersModel } = require("../models");
-
+const { ObjectId } = require('mongodb');
 
 beforeAll(async () => {
   await foodModel.deleteMany({});
@@ -40,7 +40,7 @@ async function createCategory(name, testToken) {
 }
 //ME FALTA TEST DE CATEOGRIA SIN ALERGIA EL TEMA ES QUE DA ERROR POR QUE 
 //LAS FOODS NOS E FILTRAN POR USER... QUEDAN VARIAS CREADAS
-test("User with Allergy to Banana cant see the food Manzana", async () => {
+test("User with Allergy to Banana cant see the food Banana", async () => {
   const testToken = await generateToken();
   const category = await createCategory("Fruta", testToken);
   const foodToSend2 = {
@@ -58,14 +58,23 @@ test("User with Allergy to Banana cant see the food Manzana", async () => {
     .set("Authorization", "Bearer " + testToken);
   expect(response2.statusCode).toEqual(200);
 
-  const response3 = await request(app).put("/api/auth/users").send({
-    allergies: [response2._body.data._id],
-  }).set("Authorization", "Bearer " + testToken);
+  const response3 = await request(app) // busca si existe en la base de datos y verifica que todos los datos esten ok
+    .get("/api/auth/users/")
+    .set("Authorization", "Bearer " + testToken);
 
+  response3.body.data.allergies.push({allergyId:response2._body.data._id}) // agrega la food como alergia
   const response4 = await request(app)
+  .put("/api/auth/users")
+  .send(response3.body.data)
+  .set("Authorization", "Bearer " + testToken)
+  .set("Content-Type", "application/json");
+
+expect(response4.statusCode).toEqual(200);
+
+  const response5 = await request(app)
     .get("/api/foods/")
     .set("Authorization", "Bearer " + testToken);
-  expect(response4._body.data).toEqual([])
+  expect(response5._body.data).toEqual([])
 }, 7000);
 
 test("A food can't be created without a name", async () => {
@@ -150,28 +159,6 @@ test("User cant create without a valid token", async () => {
   expect(response.body.message).toEqual("Failed to authenticate token");
 });
 
-test("User create a food succesfully", async () => {
-  const testToken = await generateToken();
-  const category = await createCategory("Verdura", testToken);
-  const foodToSend = {
-    name: "Rucula",
-    calories: 2,
-    weight: 10,
-    category: category,
-    carbs: 0,
-    proteins: 0,
-    fats: 0,
-  };
-  const response = await request(app)
-    .post("/api/foods")
-    .send(foodToSend)
-    .set("Authorization", "Bearer " + testToken);
-  expect(response.statusCode).toEqual(200);
-  const foodId = response._body.data._id;
-  const food = await foodModel.findById(foodId);
-  expect(food).toBeTruthy(); 
-  expect(food.name).toEqual("Rucula");
-});
 test("User create a foods and gets it successfully", async () => {
   const testToken = await generateToken();
   const category = await createCategory("Carne", testToken);
@@ -254,81 +241,3 @@ test("User create a food with cateogry 'Carne' and a food with cateogry 'Fruta',
     expect(item.category.name).toEqual("Carne");
   });
 }, 7000);
-
-/*
-
-test("Esto deberia retornar un 403", async() => {
-    const response = await request(app)
-    .post('/api/foods')
-    .send(
-        {
-            "name":"",
-            "calories":"10",
-            "weight": "10",
-            "category": "Carne"
-        }
-    )
-    expect(response.statusCode).toEqual(403);
-})
-
-test("Se creo el alimento correctamente", async() => {
-    const response = await request(app)
-    .post('/api/foods')
-    .send(
-        {
-            "name": "Rucula",
-            "calories": "2",
-            "weight": "10",
-            "category": "Carne",
-            "carbs": "",
-            "proteins": "",
-            "fats": ""
-        }
-    )
-    expect(response.statusCode).toEqual(200);
-})
-
-test("[GET FOODS BY CATEGORY] Se obtuvieron los alimentos por categoria correctamente", async() => {
-    const response = await request(app)
-    .get('/api/foods/category/Carne')
-    expect(response.statusCode).toEqual(200);
-})
-
-test("Se obtuvieron los alimentos correctamente [200]", async() => {
-    const response = await request(app)
-    .get('/api/foods')
-    expect(response.statusCode).toEqual(200);
-})
-
-test('[GET FOODS]Esto deberia retornar un 500', async () => {
-    findStub = sinon.stub(foodModel, 'find').throws(new Error('Database error'));
-
-    const response = await request(app)
-      .get('/api/foods');
-
-    expect(response.status).toEqual(500);
-}, 1000);
-
-test('[CREATE FOOD]Esto deberia retornar un 500', async () => {
-    sinon.stub(foodModel, 'create').throws(new Error('Database error'));
-
-    const response = await request(app)
-      .post('/api/foods')
-      .send({
-                "name": "Rucula",
-                "calories": "2",
-                "weight": "10",
-                "category": "Carne"
-            });
-
-    expect(response.status).toEqual(500);
-});
-
-test('[GET FOODS BY CATEGORY]Esto deberia retornar un 500', async () => {
-    findStub.throws(new Error('Database error'));
-
-    const response = await request(app)
-    .get('/api/foods/category/Verdura');
-
-    expect(response.status).toEqual(500);
-});*/

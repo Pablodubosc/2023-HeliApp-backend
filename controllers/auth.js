@@ -92,22 +92,10 @@ const updateUserPassword = async (req, res) => {
 
 const updateUser = async (req, res) => {
   try {
-    const userId = req.params.id;
-    const updatedUser = await usersModel.findOneAndUpdate(
-      { email: req.params.email },
-      req.body,
-      { new: true }
-    );
-
-    if (!updatedUser) {
-      return res.status(404).send({ message: "USER_NOT_FOUND" });
-    }
-
-    res
-      .status(200)
-      .send({ message: "USER_UPDATE_SUCCESFULL", user: updatedUser });
+    const userId = req.userId;
+    const data = await usersModel.findOneAndUpdate({ _id: userId }, req.body);
+    res.status(200).send({ message: "USER_UPDATE_SUCCESFULL" });
   } catch (e) {
-    console.error(e); // Agregar registro del error
     handleHttpError(res, "ERROR_UPDATE_USER", 500);
   }
 };

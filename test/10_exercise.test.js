@@ -84,22 +84,6 @@ test("User cant create without a valid token", async () => {
   },7000);
 
 
-  test("User create a exercise succesfully", async () => {
-    const testToken = await generateToken();
-    const response = await request(app)
-    .post('/api/exercise')
-    .send({
-            name:"Caminata",
-            caloriesBurn:10,
-            time: 10,
-        }).set("Authorization", "Bearer " + testToken);
-    expect(response.statusCode).toEqual(200);
-    const exerciseId = response._body.data._id;
-    const exercise = await exerciseModel.findById(exerciseId);
-    expect(exercise).toBeTruthy(); 
-    expect(exercise.name).toEqual("Caminata");
-  });
-
   test("User create two exercises and gets it successfully", async () => {
     const testToken = await generateToken();
     const response = await request(app)

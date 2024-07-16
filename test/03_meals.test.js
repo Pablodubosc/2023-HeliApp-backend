@@ -133,7 +133,7 @@ test("Cant create a meal if user is allergy to a food component", async () => {
   const foods = await createFoods(testToken);
   //seteo alergia en una food de la unica comida que hay
   const response = await request(app).put("/api/auth/users").send({
-    allergies: [foods[0].foodId],
+    allergies: [{allergyId:foods[0].foodId}],
   }).set("Authorization", "Bearer " + testToken);
   expect(response.statusCode).toEqual(200);
   const response1 = await request(app)
@@ -163,7 +163,7 @@ test("User create a meals, then add an allergy, so GET has a WARNING", async () 
     .set("Authorization", "Bearer " + testToken);
   expect(response.statusCode).toEqual(200);
   const response1 = await request(app).put("/api/auth/users").send({
-    allergies: [foods[0].foodId],
+    allergies: [{allergyId:foods[0].foodId}],
   }).set("Authorization", "Bearer " + testToken);
   expect(response1.statusCode).toEqual(200);
   const response2 = await request(app)
@@ -175,7 +175,7 @@ test("User create a meals, then add an allergy, so GET has a WARNING", async () 
   expect(response2._body.data[0].totalFats).toEqual(20);
   expect(response2._body.data[0].totalCarbs).toEqual(60);
   expect(response2._body.data[0].totalProteins).toEqual(40);
-  expect(response2._body.data[0].allergy).toEqual("Lomo");
+  expect(response2._body.data[0].allergy).toEqual(true);
 });
 
 test("A meal cannot be created without name", async () => { //  y esto?
@@ -306,11 +306,11 @@ test("Calories between two dates should return each day and calories", async () 
     })
     .set("Authorization", "Bearer " + testToken);
   const startDate = encodeURI(
-    "Mon Apr 16 2024 00:00:00 GMT-0300 (hora estándar de Argentina)"
+    "Mon Jul 15 2024 00:00:00 GMT-0300 (hora estándar de Argentina)"
   );
 
   const endDate = encodeURI(
-    "Wed Apr 25 2024 00:00:52 GMT-0300 (hora estándar de Argentina)"
+    "Mon Jul 29 2024 00:00:52 GMT-0300 (hora estándar de Argentina)"
   );
 
   const response1 = await request(app)

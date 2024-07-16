@@ -205,7 +205,7 @@ test("POST to create a plan for a user with not available foods because he is al
     expect(response.statusCode).toEqual(200);
     //seteo alergia en una food de la unica comida que hay
     const response2 = await request(app).put("/api/auth/users").send({
-      allergies: [response._body.data.foods[0].foodId],
+      allergies: [{allergyId : response._body.data.foods[0].foodId}],
     }).set("Authorization", "Bearer " + testToken);
 
     expect(response2.statusCode).toEqual(200);

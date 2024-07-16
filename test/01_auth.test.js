@@ -67,6 +67,7 @@ test("User sign up and update his allergies and is succesfully stored in the DB"
     age: "23",
     height: "1.80",
     weight: "70",
+    allergies : []
   });
   expect(response.statusCode).toEqual(200); // valida que se registro ok
   const response1 = await request(app).post("/api/auth/login").send({
@@ -86,17 +87,17 @@ test("User sign up and update his allergies and is succesfully stored in the DB"
     .set("Authorization", "Bearer " + response1._body.token);
     
     const response3 = await request(app).put("/api/auth/users").send({
-      allergies: [response2._body.data._id],
+      allergies: [{allergyId:response2._body.data._id}],
     }).set("Authorization", "Bearer " + response1._body.token);
   
     const response4 = await request(app) // busca si existe en la base de datos y verifica que todos los datos esten ok
     .get("/api/auth/users/")
     .set("Authorization", "Bearer " + response1._body.token);
-    expect(response4.body.data.allergies[0].name).toEqual("Prueba")
+    expect(response4.body.data.allergies.length).toEqual(1)
 });
 
 
-test("User cant update his user with a random token", async () => {
+test("User cant update his Password with a random token", async () => {
   const response = await request(app)
     .put("/api/auth/users/updatePassword/")
     .send({
@@ -107,7 +108,7 @@ test("User cant update his user with a random token", async () => {
   expect(response._body.message).toEqual("Failed to authenticate token");
 });
 
-test("User cant update his user with an invalid token format", async () => {
+test("User cant update his Password with an invalid token format", async () => {
   const response = await request(app)
     .put("/api/auth/users/updatePassword/")
     .send({
@@ -118,7 +119,7 @@ test("User cant update his user with an invalid token format", async () => {
   expect(response._body.message).toEqual("Invalid token format");
 });
 
-test("User cant update his user without a token", async () => {
+test("User cant update his Password without a token", async () => {
   const response = await request(app)
     .put("/api/auth/users/updatePassword/")
     .send({
@@ -230,34 +231,6 @@ test("User sign up and then delete his account succesfull", async () => {
   expect(response4._body.message).toEqual("USER_NOT_EXISTS");
 });
 
-/*
-  test("User sing up and the user info is obtained via its email", async () => { // NO DEBERIA ANDAR REVISAR
-    const response = await request(app).post("/api/auth/register").send({
-      firstName: "test",
-      lastName: "user",
-      email: "testuser999@gmail.com",
-      password: "testuser",
-      sex: "male",
-      age: "23",
-      height: "1.80",
-      weight: "70",
-    });
-    expect(response.statusCode).toEqual(200);
-    const testToken = generateTestToken();
-    const response1 = await request(app)
-      .get("/api/auth/users/email/testuser999@gmail.com")
-      .set("Authorization", "Bearer " + testToken);
-    expect(response1.statusCode).toEqual(200);
-    expect(response1.body.data.firstName).toEqual("test");
-    expect(response1.body.data.lastName).toEqual("user");
-    expect(response1.body.data.email).toEqual("testuser999@gmail.com");
-    expect(response1.body.data.sex).toEqual("male");
-    expect(response1.body.data.age).toEqual(23);
-    expect(response1.body.data.height).toEqual(1.8);
-    expect(response1.body.data.weight).toEqual(70);
-  });
-  
-  */
   
   
   

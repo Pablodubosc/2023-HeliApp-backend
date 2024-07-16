@@ -6,6 +6,7 @@ const getFoods = async (req, res) => {
     const user = req.user;
     const allFoods = await foodModel.find({}).populate({ path: "category" }).exec();
     const userModel = await usersModel.findById(user)
+    //console.log("EN EL GET FOODS " + userModel.allergies)
     const data = allFoods.filter(alimento => !(userModel.allergies).some(alergia => alergia.allergyId.toString() === alimento._id.toString()));
     res.send({ data });
   } catch (e) {

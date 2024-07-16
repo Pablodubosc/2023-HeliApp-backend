@@ -150,7 +150,8 @@ const createMeal = async (req, res) => {
     const allergicFoods = userJson.allergies;
     // verifica si la comidas que no contienen alimentos alérgicos
     const hasAllergy = req.body.foods.some(food => {
-      return allergicFoods.includes(food.foodId);
+      // Verificar si algún food.foodId está en allergicFoods.allergyId
+      return allergicFoods.some(allergicFood => allergicFood.allergyId.equals(food.foodId));
     });
      
     if (hasAllergy){
