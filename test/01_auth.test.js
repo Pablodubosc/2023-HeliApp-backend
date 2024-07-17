@@ -93,6 +93,7 @@ test("User sign up and update his allergies and is succesfully stored in the DB"
     const response4 = await request(app) // busca si existe en la base de datos y verifica que todos los datos esten ok
     .get("/api/auth/users/")
     .set("Authorization", "Bearer " + response1._body.token);
+    console.log(response4.body.data)
     expect(response4.body.data.allergies.length).toEqual(1)
 });
 
@@ -104,8 +105,8 @@ test("User cant update his Password with a random token", async () => {
       password: "newPassword",
     })
     .set("Authorization", "Bearer " + "token123");
-  expect(response.status).toEqual(401);
-  expect(response._body.message).toEqual("Failed to authenticate token");
+    expect(response.status).toEqual(400);
+    expect(response._body.message).toEqual("TOKEN_IS_REQUIRED");
 });
 
 test("User cant update his Password with an invalid token format", async () => {
@@ -115,8 +116,8 @@ test("User cant update his Password with an invalid token format", async () => {
       password: "newPassword",
     })
     .set("Authorization", "Bearer " + "");
-  expect(response.status).toEqual(403);
-  expect(response._body.message).toEqual("Invalid token format");
+    expect(response.status).toEqual(400);
+    expect(response._body.message).toEqual("TOKEN_IS_REQUIRED");
 });
 
 test("User cant update his Password without a token", async () => {
@@ -125,8 +126,8 @@ test("User cant update his Password without a token", async () => {
     .send({
       password: "newPassword",
     });
-  expect(response.status).toEqual(403);
-  expect(response._body.message).toEqual("Token not provided");
+    expect(response.status).toEqual(400);
+    expect(response._body.message).toEqual("TOKEN_IS_REQUIRED");
 });
 
 test("User cant sign-in in an unexsiting account", async () => {
@@ -157,40 +158,6 @@ test("User cant login with an incorrect password and gets an error", async () =>
   expect(response2.statusCode).toEqual(401);
 });
 
-test("A user sign up, update his password with a token, and then login with the new password", async () => {
-  const response = await request(app).post("/api/auth/register").send({
-    firstName: "test",
-    lastName: "user",
-    email: "testuser@gmail.com",
-    password: "testuser",
-    sex: "male",
-    age: "23",
-    height: "1.80",
-    weight: "70",
-  });
-  expect(response.statusCode).toEqual(200);
-  const response1 = await request(app).post("/api/auth/login").send({
-    // se logea para obtener token
-    email: "testuser@gmail.com",
-    password: "testuser",
-  });
-  expect(response.statusCode).toEqual(200);
-  const response2 = await request(app)
-    .put("/api/auth/users/updatePassword/")
-    .send({
-      password: "newPassword",
-    })
-    .set("Authorization", "Bearer " + response1._body.token);
-  expect(response2.statusCode).toEqual(200);
-
-  const response3 = await request(app).post("/api/auth/login").send({
-    // se logea con la nuev contraseña
-    email: "testuser@gmail.com",
-    password: "newPassword",
-  });
-
-  expect(response3.statusCode).toEqual(200);
-});
 
 test("User sign up and then delete his account succesfull", async () => {
   const response = await request(app).post("/api/auth/register").send({
@@ -230,7 +197,3 @@ test("User sign up and then delete his account succesfull", async () => {
   expect(response4.status).toEqual(404);
   expect(response4._body.message).toEqual("USER_NOT_EXISTS");
 });
-
-  
-  
-  

@@ -2,9 +2,12 @@ const { sendEmail } = require("../utils/handleEmail");
 const { usersModel } = require("../models");
 const { updateUser } = require("../controllers/auth");
 const { handleHttpError } = require("../utils/handleErrors");
-
+function getUID() {
+  return Date.now().toString(36);
+}
 const sendResetPasswordEmail = async (req, res) => {
-  const { email, token, userName, userId, url } = req.body;
+  const { email, userName, userId, url } = req.body;
+  const token = getUID();
   try {
     const reqUpdateUser = {
       params: {
@@ -28,9 +31,9 @@ const sendResetPasswordEmail = async (req, res) => {
         return resUpdateUser;
       },
     };
-
+    
     await updateUser(reqUpdateUser, resUpdateUser);
-
+    
     if (updateUserResponseStatus === 200) {
       const send_to = email;
       const sent_from = process.env.EMAIL_USER;
@@ -53,6 +56,7 @@ const sendResetPasswordEmail = async (req, res) => {
 
       res.status(200).json({ success: true, message: "Email Sent" });
     } else {
+      console.log("entra aca")
       res.status(500).json({ error: "Failed to update user token" });
     }
   } catch (error) {

@@ -50,17 +50,6 @@ const createIntermittentFasting = async (req, res) => {
   }
 };
 
-/*const getIntermittentFastingByUserId = async (req, res) => {
-  try {
-    const data = await intermittentFastingModel.find({
-      userId: req.userId,
-    });
-    res.send({ data });
-  } catch (e) {
-    handleHttpError(res, "ERROR_GET_INTERMITTENT_FASTING_BY_USER_ID", 500);
-  }
-};*/
-
 const getActiveIntermittentFastingByUserId = async (req, res) => {
   try {
     const data = await intermittentFastingModel.find({
@@ -108,6 +97,18 @@ const getNextIntermittentFastingByUserId = async (req, res) => {
 
 const deleteActiveIntermittentFasting = async (req, res) => {
   try {
+    userId = req.userId;
+    const intFastToDelete = await intermittentFastingModel.findById({
+      _id: req.params.IntermittentFastingId,
+    });
+    if (!intFastToDelete || intFastToDelete.userId.toString() !== userId) {
+      return res
+        .status(403)
+        .json({
+          message:
+            "You don't have permission to cancel this intermitent fasting",
+        });
+    }
     const data = await intermittentFastingModel.delete({
       _id: req.params.IntermittentFastingId,
     });
@@ -119,7 +120,6 @@ const deleteActiveIntermittentFasting = async (req, res) => {
 
 module.exports = {
   createIntermittentFasting,
-  //getIntermittentFastingByUserId,
   getActiveIntermittentFastingByUserId,
   deleteActiveIntermittentFasting,
   getNextIntermittentFastingByUserId
