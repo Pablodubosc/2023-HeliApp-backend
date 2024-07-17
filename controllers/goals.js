@@ -90,10 +90,8 @@ const calculateGoalStatus = async (goal) => {
   today.setHours(0, 0, 0, 0);
 
   const goalStartDate = new Date(goal.startDate);
-  goalStartDate.setHours(0, 0, 0, 0);
 
   const goalEndDate = new Date(goal.endDate);
-  goalEndDate.setHours(0, 0, 0, 0);
 
   if (today < goalStartDate) {
     return "Not started";
