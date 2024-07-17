@@ -87,7 +87,7 @@ const getActiveGoalsByUserId = async (req, res) => {
 
 const calculateGoalStatus = async (goal) => {
   const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  today.setHours(12, 0, 0, 0);
 
   const goalStartDate = new Date(goal.startDate);
 
