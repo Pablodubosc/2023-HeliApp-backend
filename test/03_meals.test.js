@@ -419,3 +419,40 @@ test("Can't delete a meal from another user", async () => {
     "You don't have permission to delete this meal"
   );
 });
+
+test("User creates an intermiten fasting and POST a meal when its active, the fasting is automatically canceled", async () => {
+  const testToken = await login("adminuser@admin.com");
+  const foods = await createFoods(testToken);
+  const intermitentResponse = await request(app)
+    .post("/api/intermittentFasting")
+    .send({
+      startDateTime: "2023-10-22T03:00:15.454Z",
+      endDateTime: "2024-10-23T05:00:15.454Z",
+    })
+    .set("Authorization", "Bearer " + testToken);
+  expect(intermitentResponse.statusCode).toEqual(200);
+  const response = await request(app)
+    .post("/api/meals")
+    .send({
+      name: "Asado",
+      foods: foods,
+      date: new Date(),
+      hour: "20:15",
+    })
+    .set("Authorization", "Bearer " + testToken);
+  expect(response.statusCode).toEqual(200);
+  const response1 = await request(app)
+    .get("/api/meals/user")
+    .set("Authorization", "Bearer " + testToken);
+  expect(response1.statusCode).toEqual(200);
+  expect(response1._body.data[0].name).toEqual("Asado");
+  expect(response1._body.data[0].totalCalories).toEqual(60);
+  expect(response1._body.data[0].totalFats).toEqual(20);
+  expect(response1._body.data[0].totalCarbs).toEqual(60);
+  expect(response1._body.data[0].totalProteins).toEqual(40);
+  const deletedInt = await intermittentFastingModel.findById(
+    intermitentResponse._body.data._id
+  );
+
+  expect(deletedInt).toBeNull();
+});
