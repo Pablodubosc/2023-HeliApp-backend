@@ -6,16 +6,19 @@ const userSchema = new mongoose.Schema(
     {
         firstName:{
             type: String,
-            required: true,            
+            required: true,
+            maxlength: 25,            
         },
         lastName:{
             type: String,
             required: true,
+            maxlength: 25,  
         },
         email:{
             type: String,
             required: true,
             unique: true,
+            maxlength: 40,  
         },
         password:{
             type: String,
@@ -28,14 +31,17 @@ const userSchema = new mongoose.Schema(
         age:{
             type: Number,
             required: true,
+            max: 99
         },
         height:{
             type: Number,
             required: true,
+            max: 999
         },
         weight:{
             type: Number,
             required: true,
+            max: 999
         },
         allergies: [{
             allergyId:{

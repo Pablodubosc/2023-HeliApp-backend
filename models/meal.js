@@ -6,6 +6,7 @@ const mealSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
+      maxlength: 17,
     },
     foods: {
       type: [
@@ -20,6 +21,7 @@ const mealSchema = new mongoose.Schema(
             min: [0],
             default: 0,
             required: true,
+            max: 999999,
           },
         },
       ],

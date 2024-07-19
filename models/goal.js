@@ -6,6 +6,7 @@ const goalSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
+      maxlength: 17,
     },
     type:{
         type: String,
@@ -22,6 +23,7 @@ const goalSchema = new mongoose.Schema(
       type: Number,
       min: [0],
       required: true,
+      max: 999999,
     },
     userId: {
       type: mongoose.Schema.Types.ObjectId,

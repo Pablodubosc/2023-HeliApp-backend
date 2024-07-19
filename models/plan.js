@@ -5,7 +5,8 @@ const planSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: true
+      required: true,
+      maxlength: 17,
     },
     suggestions: {
       type: [],
@@ -31,7 +32,8 @@ const planSchema = new mongoose.Schema(
     planObjetive: {
       type: Number,
       min: [0],
-      required: true
+      required: true,
+      max: 999999,
     },
     startDate: {
       type: Date,

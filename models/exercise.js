@@ -6,16 +6,19 @@ const exerciseSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
+      maxlength: 17,
     },
     caloriesBurn: {
       type: Number,
       min: [0],
       required: true,
+      max: 9999,
     },
     time: {
       type: Number,
       min: [0],
       default: 0,
+      max: 999999,
     }
   },
   {
