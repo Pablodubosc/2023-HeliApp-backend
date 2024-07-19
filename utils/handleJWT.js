@@ -9,7 +9,7 @@ const tokenSign = async (user) => {
         }, 
         JWT_SECRET, 
         { 
-            expiresIn: '10s' 
+            expiresIn: '1h' 
         }
     );
     return sign;
