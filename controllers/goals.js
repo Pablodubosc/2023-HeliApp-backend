@@ -69,6 +69,9 @@ const getGoalsByUserId = async (req, res) => {
 
 const getActiveGoalsByUserId = async (req, res) => {
   try {
+    const today = new Date();
+    today.setHours(-3, 0, 0, 0);
+
     const userId = req.userId;
     if (!userId) {
       return handleHttpError(res, "User ID not provided", 400);
@@ -77,7 +80,7 @@ const getActiveGoalsByUserId = async (req, res) => {
       .find({ userId: userId })
       .select("-userId -_id");
     const filteredData = data.filter(
-      (item) => new Date() >= item.startDate && new Date() <= item.endDate
+      (item) => today >= item.startDate && today <= item.endDate
     );
     res.send({ filteredData });
   } catch (e) {
