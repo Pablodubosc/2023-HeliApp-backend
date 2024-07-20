@@ -70,7 +70,6 @@ const getGoalsByUserId = async (req, res) => {
 const getActiveGoalsByUserId = async (req, res) => {
   try {
     const today = new Date();
-    today.setHours(-3, 0, 0, 0);
     console.log(today)
     const userId = req.userId;
     if (!userId) {
