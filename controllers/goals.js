@@ -71,7 +71,7 @@ const getActiveGoalsByUserId = async (req, res) => {
   try {
     const today = new Date();
     today.setHours(-3, 0, 0, 0);
-
+    console.log(today)
     const userId = req.userId;
     if (!userId) {
       return handleHttpError(res, "User ID not provided", 400);
@@ -79,9 +79,11 @@ const getActiveGoalsByUserId = async (req, res) => {
     const data = await goalModel
       .find({ userId: userId })
       .select("-userId -_id");
+    console.log("DATA"+data)
     const filteredData = data.filter(
       (item) => today >= item.startDate && today <= item.endDate
     );
+    console.log(filteredData)
     res.send({ filteredData });
   } catch (e) {
     handleHttpError(res, "ERROR_GET_GOALS_BY_USER_ID", 500);
