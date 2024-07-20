@@ -2,19 +2,16 @@ const express = require("express");
 const router = express.Router();
 const {
   getFoods,
+  getAllFoods,
   createFood,
   getFoodsByCategory,
-  getFoodsWithOutAllergies,
-  getFoodsByCategoryWithOutAllergies
 } = require("../controllers/foods");
 const { validatorCreateFood } = require("../validators/foods");
-//const authMiddleware = require('../middleware/sessionMiddleware');
-//const checkRol = require('../middleware/role');
+const { verifyToken } = require("../utils/handleJWT");
 
-router.get("/", getFoods);
-router.get("/:id", getFoodsWithOutAllergies);
-router.get("/category/:categoryName", getFoodsByCategory);
-router.get("/category/:categoryName/:id", getFoodsByCategoryWithOutAllergies);
-router.post("/", validatorCreateFood, createFood);
+router.get("/",verifyToken, getFoods);
+router.get("/all",verifyToken, getAllFoods);
+router.get("/category/:categoryName",verifyToken, getFoodsByCategory);
+router.post("/", validatorCreateFood,verifyToken, createFood);
 
 module.exports = router;

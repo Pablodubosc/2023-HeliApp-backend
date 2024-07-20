@@ -5,29 +5,55 @@ const planSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: true
+      required: true,
+      maxlength: 17,
     },
     suggestions: {
       type: [],
+      required: true,
+      validate: {
+        validator: function (array) {
+          return array.length > 0;
+        },
+        message: "El array debe contener al menos un elemento.",
+      },
     },
     planType:{
       type: String,
-      required: true
-    },
+      enum: ["Calories", "Fats", "Proteins", "Carbs", "Calories Burn"],
+      validate: {
+        validator: function (option) {
+          return ["Calories", "Fats", "Proteins", "Carbs", "Calories Burn"].includes(option);
+        },
+        message: "Invalid type of goal",
+      },
+      required: true,
+  },
     planObjetive: {
       type: Number,
       min: [0],
-      required: true
+      required: true,
+      max: 999999,
     },
-    startDate:{
+    startDate: {
       type: Date,
-      required: true
+      required: true,
     },
-    endDate:{
+    endDate: {
       type: Date,
+      required: true,
+      validate: {
+        validator: function (value) {
+          return this.startDate <= value;
+        },
+        message: (props) =>
+          `La fecha de fin debe ser mayor o igual a la fecha de inicio.`,
+      },
     },
     userId: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "users",
+      required: true,
     },
   },
   {
